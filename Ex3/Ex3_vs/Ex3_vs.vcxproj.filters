@@ -15,30 +15,45 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
+    <ClCompile Include="..\Ex3_mingw\main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="makefile">
+    <ClCompile Include="..\Ex3_mingw\SPArrayList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sp_nim.c">
+    <ClCompile Include="..\Ex3_mingw\SPFIARGame.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="main_aux.c">
+    <ClCompile Include="..\Ex3_mingw\SPFIARParser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Test.c">
+    <ClCompile Include="..\Ex3_mingw\SPMainAux.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Ex3_mingw\SPMinimax.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Ex3_mingw\SPMinimaxNode.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="main_aux.h">
+    <ClInclude Include="..\Ex3_mingw\SPArrayList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sp_nim.h">
+    <ClInclude Include="..\Ex3_mingw\SPFIARGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SPBufferset.h">
+    <ClInclude Include="..\Ex3_mingw\SPFIARParser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Ex3_mingw\SPMainAux.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Ex3_mingw\SPMinimax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Ex3_mingw\SPMinimaxNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

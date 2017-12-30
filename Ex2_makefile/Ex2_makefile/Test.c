@@ -4,7 +4,7 @@
 
 #define N 1000
 
-int main() {
+int main2() {
 	int n = 0;
 	int heapSizes[N];
 
