@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "SPMinimax.h"
 #include "limits.h"
 #include "SPMinimaxNode.h"
@@ -10,7 +12,11 @@ int spMinimaxSuggestMove(SPFiarGame* currentGame, unsigned int maxDepth)
 	createTree(root, maxDepth, &mallocError);
 
 	if (mallocError)
+	{
 		destroyTree(root);
+		// TODO: print error
+		return 0;
+	}
 
 	applyMinimax(root);
 	return root->colIndex;
@@ -25,7 +31,7 @@ Node* createRoot(SPFiarGame* game)
 	return root;
 }
 
-bool createTree(Node* node, unsigned int maxDepth, bool* mallocError)
+void createTree(Node* node, unsigned int maxDepth, bool* mallocError)
 {
 
 }

@@ -2,6 +2,7 @@
 #define SPMINIMAX_H_
 
 #include "SPFIARGame.h"
+#include "SPMinimaxNode.h"
 
 /**
  * Given a game state, this function evaluates the best move according to
@@ -17,6 +18,11 @@
  * which is the best move for the current player.
  */
 int spMinimaxSuggestMove(SPFiarGame* currentGame, unsigned int maxDepth);
+
+Node* createRoot(SPFiarGame* game);
+void createTree(Node* node, unsigned int maxDepth, bool* mallocError);
+void destroyTree(Node* node);
+
 
 int getScore(SPFiarGame* currentGame);
 void calcHist(SPFiarGame* currentGame, int* hist);
