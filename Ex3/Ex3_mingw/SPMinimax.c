@@ -3,6 +3,7 @@
 #include "SPMinimax.h"
 #include "limits.h"
 #include "SPMinimaxNode.h"
+#include "SPFIARGame.h"
 
 int spMinimaxSuggestMove(SPFiarGame* currentGame, unsigned int maxDepth)
 {
@@ -15,11 +16,17 @@ int spMinimaxSuggestMove(SPFiarGame* currentGame, unsigned int maxDepth)
 	{
 		destroyTree(root);
 		// TODO: print error
-		return 0;
+		return -1;
 	}
 
 	applyMinimax(root);
-	return root->colIndex;
+	for (int i = 0; i < root->childrenCount; i++)
+	{
+		if (root->score == root->children[i]->score)
+			return i;
+	}
+
+	return -1; // shouldt get here
 }
 
 Node* createRoot(SPFiarGame* game)
@@ -33,12 +40,52 @@ Node* createRoot(SPFiarGame* game)
 
 void createTree(Node* node, unsigned int maxDepth, bool* mallocError)
 {
+	int childrenIndex = 0; // for later
+	int freeCols = COLUMNS - fullColumnsCount(node->game);
 
+	if (maxDepth == 0) // TODO: maybe 1
+	{
+		node->childrenCount = 0;
+		node->children = NULL;
+		return;
+	}
+
+	node->childrenCount = freeCols;
+	node->children = (Node**)malloc(sizeof(Node*) * freeCols);
+
+	for (int i = 0; i < COLUMNS; i++)
+	{
+		if (!spFiarGameIsValidMove(node->game, i))
+			continue;
+
+		Node* son = (Node*)malloc(sizeof(Node));
+		SPFiarGame* gameCopy = spFiarGameCopy(node->game);
+
+		spFiarGameSetMove(gameCopy, i);
+
+		son->colIndex = i;
+		son->game = gameCopy;
+		son->isMaxNode = !node->isMaxNode;
+
+		createTree(son, maxDepth - 1, &mallocError);
+
+		node->children[childrenIndex++] = son;
+	}
 }
 
 void destroyTree(Node* node)
 {
+	free(node->game);
+	
+	if (node->childrenCount > 0)
+	{
+		for (int i = 0; i < node->childrenCount; i++)
+		{
+			destroyTree(node->children[i]);
+		}
 
+		free(node->children);
+	}
 }
 
 int getScore(SPFiarGame* currentGame)

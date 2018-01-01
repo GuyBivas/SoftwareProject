@@ -6,10 +6,9 @@
 
 typedef struct Node {
 	SPFiarGame* game;
-	struct Node* children;
+	struct Node** children;
 	int childrenCount;
 	bool isMaxNode;
-	bool isScoreInitialized;
 	int score;
 	int colIndex;
 } Node;
