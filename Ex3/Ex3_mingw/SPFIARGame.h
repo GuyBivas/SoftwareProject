@@ -29,14 +29,6 @@
 #define SP_FIAR_GAME_TIE_SYMBOL '-'
 #define SP_FIAR_GAME_EMPTY_ENTRY ' '
 
-#define SPAN 4
-#define ROWS 6
-#define COLUMNS 7
-#define PLAYER_1_SYMBOL 'X'
-#define PLAYER_2_SYMBOL 'O'
-#define TIE_SYMBOL '-'
-#define EMPTY_ENTRY ' '
-
 typedef struct sp_fiar_game_t {
 	char gameBoard[SP_FIAR_GAME_N_ROWS][SP_FIAR_GAME_N_COLUMNS];
 	int tops[SP_FIAR_GAME_N_COLUMNS];
@@ -166,8 +158,5 @@ char spFiarGameGetCurrentPlayer(SPFiarGame* src);
 * null character - otherwise
 */
 char spFiarCheckWinner(SPFiarGame* src);
-
-char getOtherPlayer(SPFiarGame* src);
-bool isBoardFull(SPFiarGame* src);
 
 #endif

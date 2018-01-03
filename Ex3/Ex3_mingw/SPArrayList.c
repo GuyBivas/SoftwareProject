@@ -1,35 +1,64 @@
 #include <stdio.h>
 #include "SPArrayList.h"
 #include <stdlib.h>
+#include "SPMainAux.h"
 
 SPArrayList* spArrayListCreate(int maxSize)
 {
 	SPArrayList *newList = (SPArrayList*)malloc(sizeof(SPArrayList));
+	if (newList == NULL)
+	{
+		printf("Error: spArrayListCreate has failed");
+		return NULL;
+	}
 
 	if (maxSize <= 0)
+	{
 		return NULL;
-
-	else {
+	}
+	else
+	{
 		newList->maxSize = maxSize;
 		newList->elements = (int*)malloc(sizeof(int) * maxSize);
 		newList->actualSize = 0;
+
+		if (newList->elements == NULL)
+		{
+			free(newList);
+			printf("Error: spArrayListCreate has failed");
+			return NULL;
+		}
+
 		return newList;
 	}
 }
 
-SPArrayList *spArrayListCopy(SPArrayList* src) {
+SPArrayList* spArrayListCopy(SPArrayList* src) {
 	SPArrayList* copy;
 	copy = (SPArrayList*)malloc(sizeof(SPArrayList));
+
+	if (copy == NULL)
+	{
+		printf("Error: spArrayListCopy has failed");
+		return NULL;
+	}
+
 	copy->maxSize = src->maxSize;
 	copy->actualSize = src->actualSize;
-
 	copy->elements = (int*)malloc(sizeof(int) * (src->maxSize));
+
 	if (copy->elements == NULL || src == NULL)
+	{
+		free(copy);
+		printf("Error: spArrayListCopy has failed");
 		return NULL;
-	else {
+	}
+	else
+	{
 		for (int i = 0; i < src->maxSize; i++)
 			copy->elements[i] = src->elements[i];
 	}
+
 	return copy;
 }
 
@@ -40,7 +69,6 @@ void spArrayListDestroy(SPArrayList* src)
 		free(src->elements);
 		free(src);
 	}
-
 }
 
 SP_ARRAY_LIST_MESSAGE spArrayListClear(SPArrayList* src)

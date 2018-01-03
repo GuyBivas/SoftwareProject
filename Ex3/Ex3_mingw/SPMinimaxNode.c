@@ -1,6 +1,7 @@
 #include "SPMinimax.h"
 #include "limits.h"
 #include "SPMinimaxNode.h"
+#include "SPMainAux.h"
 
 void applyMinimax(Node* node)
 {

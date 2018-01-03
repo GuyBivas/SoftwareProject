@@ -14,5 +14,6 @@ typedef struct Node {
 } Node;
 
 void applyMinimax(Node* node);
+int getMinOrMax(int a, int b, bool takeMax);
 
 #endif
