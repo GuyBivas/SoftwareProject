@@ -66,7 +66,9 @@ void spArrayListDestroy(SPArrayList* src)
 {
 	if (src != NULL)
 	{
-		free(src->elements);
+		if (src->elements != NULL)
+			free(src->elements);
+
 		free(src);
 	}
 }
@@ -76,8 +78,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListClear(SPArrayList* src)
 	if (src == NULL)
 		return SP_ARRAY_LIST_INVALID_ARGUMENT;
 
-
-	for (int i = 0; i< src->actualSize; i++)
+	for (int i = 0; i < src->actualSize; i++)
 		src->elements[i] = 0;
 
 	src->actualSize = 0;
@@ -86,17 +87,19 @@ SP_ARRAY_LIST_MESSAGE spArrayListClear(SPArrayList* src)
 
 SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, int elem, int index)
 {
-	if (src == NULL || src->actualSize <index)
+	if (src == NULL || src->actualSize < index)
 		return SP_ARRAY_LIST_INVALID_ARGUMENT;
+
 	if ((src->actualSize) + 1 > src->maxSize)
 		return SP_ARRAY_LIST_FULL;
 
-	for (int i = 0; i<index; i++)
+	for (int i = 0; i < ((src->actualSize) - index); i++)
 	{
 		src->elements[(src->actualSize) - i] = src->elements[(src->actualSize) - i - 1];
 	}
+
 	src->elements[index] = elem;
-	src->actualSize += 1;
+	src->actualSize++;
 
 	return SP_ARRAY_LIST_SUCCESS;
 }
@@ -104,9 +107,7 @@ SP_ARRAY_LIST_MESSAGE spArrayListAddAt(SPArrayList* src, int elem, int index)
 SP_ARRAY_LIST_MESSAGE spArrayListAddFirst(SPArrayList* src, int elem)
 {
 	return spArrayListAddAt(src, elem, 0);
-
 }
-
 
 SP_ARRAY_LIST_MESSAGE spArrayListAddLast(SPArrayList* src, int elem)
 {
@@ -117,15 +118,17 @@ SP_ARRAY_LIST_MESSAGE spArrayListRemoveAt(SPArrayList* src, int index)
 {
 	if (src == NULL || src->actualSize <= index)
 		return SP_ARRAY_LIST_INVALID_ARGUMENT;
+
 	if (src->actualSize == 0)
 		return SP_ARRAY_LIST_EMPTY;
 
-	for (int i = 0; i< ((src->actualSize) - index - 1); i++)
+	for (int i = 0; i < ((src->actualSize) - index - 1); i++)
+	{
 		src->elements[index + i] = src->elements[index + i + 1];
-
+	}
 
 	src->elements[src->actualSize - 1] = 0;
-	src->actualSize -= 1;
+	src->actualSize--;
 
 	return SP_ARRAY_LIST_SUCCESS;
 }

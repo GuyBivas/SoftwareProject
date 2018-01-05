@@ -8,17 +8,17 @@ char* enumToString(SP_COMMAND c)
 	switch (c)
 	{
 	case SP_UNDO_MOVE:
-		return "SP_UNDO_MOVE";
+		return "undo_move";
 	case SP_ADD_DISC:
-		return "SP_ADD_DISC";
+		return "add_disc";
 	case SP_SUGGEST_MOVE:
-		return "SP_SUGGEST_MOVE";
+		return "suggest_move";
 	case SP_QUIT:
-		return "SP_QUIT";
+		return "quit";
 	case SP_RESTART:
-		return "SP_RESTART";
+		return "restart";
 	case SP_INVALID_LINE:
-		return "SP_INVALID_LINE";
+		return "invalid_line";
 
 	default:
 		return "notcmd";

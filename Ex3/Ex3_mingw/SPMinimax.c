@@ -20,7 +20,7 @@ int spMinimaxSuggestMove(SPFiarGame* currentGame, unsigned int maxDepth)
 
 	if (mallocError)
 	{
-		destroyTree(root, true);
+		destroyTree(root);
 		printf("Error: spMinimaxSuggestMove has failed");
 		return -1;
 	}
@@ -32,7 +32,7 @@ int spMinimaxSuggestMove(SPFiarGame* currentGame, unsigned int maxDepth)
 		if (root->score == root->children[i]->score)
 		{
 			int result = root->children[i]->colIndex;
-			destroyTree(root, false);
+			destroyTree(root);
 			return result;
 		}
 	}
@@ -47,8 +47,8 @@ Node* createRoot(SPFiarGame* game)
 	if (root == NULL)
 		return NULL;
 
-	root->game = game;
-	root->isMaxNode = (game->currentPlayer == PLAYER_2_SYMBOL); // true when comp;
+	root->game = spFiarGameCopy(game);
+	root->isMaxNode = (game->currentPlayer == SP_FIAR_GAME_PLAYER_1_SYMBOL); // true when comp;
 
 	return root;
 }
@@ -56,9 +56,9 @@ Node* createRoot(SPFiarGame* game)
 void createTree(Node* node, unsigned int maxDepth, bool* mallocError)
 {
 	int childrenIndex = 0; // for later
-	int freeCols = COLUMNS - fullColumnsCount(node->game);
+	int freeCols = SP_FIAR_GAME_N_COLUMNS - fullColumnsCount(node->game);
 
-	if (maxDepth == 0) // TODO: maybe 1
+	if (maxDepth == 0 || freeCols == 0)
 	{
 		node->childrenCount = 0;
 		node->children = NULL;
@@ -75,7 +75,7 @@ void createTree(Node* node, unsigned int maxDepth, bool* mallocError)
 		return;
 	}
 
-	for (int i = 0; i < COLUMNS; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_COLUMNS; i++)
 	{
 		if (!spFiarGameIsValidMove(node->game, i))
 			continue;
@@ -85,6 +85,11 @@ void createTree(Node* node, unsigned int maxDepth, bool* mallocError)
 
 		if (son == NULL || gameCopy == NULL)
 		{
+			for (int j = childrenIndex; j < freeCols; j++)
+			{
+				node->children[j] = NULL;
+			}
+
 			if (son != NULL)
 				free(son);
 
@@ -115,23 +120,25 @@ void createTree(Node* node, unsigned int maxDepth, bool* mallocError)
 	}
 }
 
-void destroyTree(Node* node, bool includeRoot)
+void destroyTree(Node* node)
 {
 	if (node == NULL)
 		return;
 
-	if (includeRoot)
-		free(node->game);
+	spFiarGameDestroy(node->game);
+	//free(node->game);
 
 	if (node->childrenCount > 0)
 	{
 		for (int i = 0; i < node->childrenCount; i++)
 		{
-			destroyTree(node->children[i], false);
+			destroyTree(node->children[i]);
 		}
 
 		free(node->children);
 	}
+
+	free(node);
 }
 
 int getScore(SPFiarGame* currentGame)
@@ -159,13 +166,7 @@ int getScore(SPFiarGame* currentGame)
 			score += weightVector[i] * hist[i];
 	}
 
-	score = inverseNumber(score);
 	return score;
-
-	/*if (currentGame->currentPlayer == PLAYER_1_SYMBOL)
-		return score;
-	else
-		return inverseNumber(score);*/
 }
 
 void calcHist(SPFiarGame* currentGame, int* hist)
@@ -181,9 +182,9 @@ void scanVerticalBlocks(SPFiarGame* src, int* hist)
 	char arr[4];
 	int blockScore;
 
-	for (int i = 0; i < ROWS - 3; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_ROWS - 3; i++)
 	{
-		for (int j = 0; j < COLUMNS; j++)
+		for (int j = 0; j < SP_FIAR_GAME_N_COLUMNS; j++)
 		{
 			for (int k = 0; k < 4; k++)
 			{
@@ -201,9 +202,9 @@ void scanHorizontalBlocks(SPFiarGame* src, int* hist)
 	char arr[4];
 	int blockScore;
 
-	for (int i = 0; i < ROWS; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_ROWS; i++)
 	{
-		for (int j = 0; j < COLUMNS - 3; j++)
+		for (int j = 0; j < SP_FIAR_GAME_N_COLUMNS - 3; j++)
 		{
 			for (int k = 0; k < 4; k++)
 			{
@@ -221,9 +222,9 @@ void scanDiag1Blocks(SPFiarGame* src, int* hist)
 	char arr[4];
 	int blockScore;
 
-	for (int i = 0; i < ROWS - 3; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_ROWS - 3; i++)
 	{
-		for (int j = 0; j < COLUMNS - 3; j++)
+		for (int j = 0; j < SP_FIAR_GAME_N_COLUMNS - 3; j++)
 		{
 			for (int k = 0; k < 4; k++)
 			{
@@ -241,9 +242,9 @@ void scanDiag2Blocks(SPFiarGame* src, int* hist)
 	char arr[4];
 	int blockScore;
 
-	for (int i = 0; i < ROWS - 3; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_ROWS - 3; i++)
 	{
-		for (int j = 3; j < COLUMNS; j++)
+		for (int j = 3; j < SP_FIAR_GAME_N_COLUMNS; j++)
 		{
 			for (int k = 0; k < 4; k++)
 			{
@@ -256,25 +257,15 @@ void scanDiag2Blocks(SPFiarGame* src, int* hist)
 	}
 }
 
-int inverseNumber(int num)
-{
-	if (num == INT_MIN)
-		return INT_MAX;
-	else if (num == INT_MAX)
-		return INT_MIN;
-	else
-		return -num;
-}
-
 int calcBlockScore(char* arr)
 {
 	int score = 0;
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (arr[i] == PLAYER_1_SYMBOL)
+		if (arr[i] == SP_FIAR_GAME_PLAYER_1_SYMBOL)
 			score++;
-		else if (arr[i] == PLAYER_2_SYMBOL)
+		else if (arr[i] == SP_FIAR_GAME_PLAYER_2_SYMBOL)
 			score--;
 	}
 

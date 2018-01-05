@@ -3,15 +3,13 @@
 #include <string.h>
 #include <ctype.h>
 
-bool parserMemError = false; //TODO: remove
-
 void printWinner(SPFiarGame* curGame) {
 	if (spFiarCheckWinner(curGame) == SP_FIAR_GAME_PLAYER_1_SYMBOL)
 		printf("Game over: you win\nPlease enter 'quit' to exit or 'restart' to start a new game!\n");
 	if (spFiarCheckWinner(curGame) == SP_FIAR_GAME_PLAYER_2_SYMBOL)
 		printf("Game over: computer wins\nPlease enter 'quit' to exit or 'restart' to start a new game!\n");
 	if (spFiarCheckWinner(curGame) == SP_FIAR_GAME_TIE_SYMBOL)
-		printf("Game over: it’s a tie\nPlease enter 'quit' to exit or 'restart' to start a new game!\n");
+		printf("Game over: it's a tie\nPlease enter 'quit' to exit or 'restart' to start a new game!\n");
 }
 
 void endGame(SPFiarGame * game, bool isMemError) {
@@ -37,11 +35,9 @@ int doUserCommand(SPFiarGame* curGame, int maxDepth) {
 	SPCommand curCommand;
 	SP_FIAR_GAME_MESSAGE curGameMsg;
 	char command[SP_MAX_LINE_LENGTH];
-	//fgets(command, SP_MAX_LINE_LENGTH, stdin);
-	curCommand = spParserPraseLine("SP_ADD_DISC 4");
-	//curCommand = spParserPraseLine(command); // TODO
-	if (parserMemError)
-		endGame(curGame, true);
+	fgets(command, SP_MAX_LINE_LENGTH, stdin);
+	curCommand = spParserPraseLine(command);
+
 	if (curCommand.cmd == SP_INVALID_LINE) {
 		printf("Error: invalid command\n");
 		return doUserCommand(curGame, maxDepth);
@@ -65,8 +61,7 @@ int doUserCommand(SPFiarGame* curGame, int maxDepth) {
 			printf("Error: column number must be in range 1-7\n");
 			return doUserCommand(curGame, maxDepth);
 		}
-		curGameMsg = spFiarGameSetMove(curGame, spMinimaxSuggestMove(curGame, maxDepth));
-		//curGameMsg = spFiarGameSetMove(curGame, curCommand.arg - 1); // TODO
+		curGameMsg = spFiarGameSetMove(curGame, curCommand.arg - 1);
 		if (curGameMsg == SP_FIAR_GAME_INVALID_ARGUMENT) {
 			printf("Error: column number must be in range 1-7\n");
 			return doUserCommand(curGame, maxDepth);
@@ -88,14 +83,12 @@ int doUserCommand(SPFiarGame* curGame, int maxDepth) {
 	return 0;
 }
 
-SPCommand readCommand(SPFiarGame *curGame) {
+SPCommand readCommand() {
 	SPCommand cmd;
 	char command[SP_MAX_LINE_LENGTH];
-	//fgets(command, SP_MAX_LINE_LENGTH, stdin);
-	cmd = spParserPraseLine("SP_ADD_DISC 4");
-	//cmd = spParserPraseLine(command); // TODO
-	if (parserMemError)
-		endGame(curGame, true);
+	fgets(command, SP_MAX_LINE_LENGTH, stdin);
+	cmd = spParserPraseLine(command);
+
 	return cmd;
 }
 
@@ -128,7 +121,7 @@ int getMaxDepth() {
 		return getMaxDepth();
 	}
 	curNum = atoi(const_pointer);
-	if (curNum < 1 || curNum>7) {
+	if (curNum < 1 || curNum > 7) {
 		printf("Error: invalid level (should be between 1 to 7)\n");
 		free(strCopy);
 		return getMaxDepth();

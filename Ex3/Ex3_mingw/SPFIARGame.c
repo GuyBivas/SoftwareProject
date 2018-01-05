@@ -23,20 +23,20 @@ SPFiarGame* spFiarGameCreate(int historySize)
 		return NULL;
 	}
 
-	for (int i = 0; i < COLUMNS; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_COLUMNS; i++)
 	{
 		game->tops[i] = 0;
 	}
 
-	for (int i = 0; i < ROWS; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_ROWS; i++)
 	{
-		for (int j = 0; j < COLUMNS; j++)
+		for (int j = 0; j < SP_FIAR_GAME_N_COLUMNS; j++)
 		{
 			game->gameBoard[i][j] = ' ';
 		}
 	}
 
-	game->currentPlayer = PLAYER_1_SYMBOL;
+	game->currentPlayer = SP_FIAR_GAME_PLAYER_1_SYMBOL;
 
 	return game;
 }
@@ -53,17 +53,16 @@ SPFiarGame* spFiarGameCopy(SPFiarGame* src)
 
 	newGame->currentPlayer = src->currentPlayer;
 
-	for (int i = 0; i < ROWS; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_ROWS; i++)
 	{
-		for (int j = 0; j < COLUMNS; j++)
+		for (int j = 0; j < SP_FIAR_GAME_N_COLUMNS; j++)
 		{
 			newGame->gameBoard[i][j] = src->gameBoard[i][j];
 		}
 	}
 
-	for (int k = 0; k < COLUMNS; k++)
+	for (int k = 0; k < SP_FIAR_GAME_N_COLUMNS; k++)
 		newGame->tops[k] = src->tops[k];
-
 
 	newGame->history = spArrayListCopy(src->history);
 
@@ -81,13 +80,14 @@ void spFiarGameDestroy(SPFiarGame* src)
 	if (src == NULL)
 		return;
 
-	free(src->history);
+	spArrayListDestroy(src->history);
+	//free(src->history);
 	free(src);
 }
 
 SP_FIAR_GAME_MESSAGE spFiarGameSetMove(SPFiarGame* src, int col)
 {
-	if (src == NULL || col > COLUMNS - 1 || col < 0)
+	if (src == NULL || col > SP_FIAR_GAME_N_COLUMNS - 1 || col < 0)
 		return SP_FIAR_GAME_INVALID_ARGUMENT;
 
 	if (spFiarGameIsValidMove(src, col) == false)
@@ -109,36 +109,63 @@ SP_FIAR_GAME_MESSAGE spFiarGameSetMove(SPFiarGame* src, int col)
 
 bool spFiarGameIsValidMove(SPFiarGame* src, int col)
 {
-	return src->tops[col] < ROWS;
+	if (src == NULL)
+		return false;
+
+	return src->tops[col] < SP_FIAR_GAME_N_ROWS;
 }
 
 // review
 SP_FIAR_GAME_MESSAGE spFiarGameUndoPrevMove(SPFiarGame* src)
 {
-	int rowNum, colNum, k;
+	int rowNum, colNum;
+
 	if (src == NULL)
-		return SP_FIAR_GAME_INVALID_ARGUMENT;
-	if (src->history->actualSize == 0)
-		return SP_FIAR_GAME_NO_HISTORY;
-
-	if (spFiarCheckWinner(src) == SP_FIAR_GAME_PLAYER_1_SYMBOL) //checks if the undo made after player's win.
-		k = 1;
-	else
-		k = 2;
-
-
-	for (int i = 0; i < k; i++)
 	{
+		printf("Error: cannot undo previous move!\n");
+		return SP_FIAR_GAME_INVALID_ARGUMENT;
+	}
+
+	if (src->history->actualSize == 0)
+	{
+		printf("Error: cannot undo previous move!\n");
+		return SP_FIAR_GAME_NO_HISTORY;
+	}
+
+	if (src->history->actualSize == 1)
+	{
+		char symbol;
 		colNum = spArrayListGetLast(src->history);
 		rowNum = src->tops[colNum] - 1;
 
-		src->gameBoard[rowNum][colNum] = '0';
-		spArrayListRemoveLast(src->history);
-		src->tops[colNum] -= 1;
+		symbol = src->gameBoard[rowNum][colNum];
+		if (symbol == SP_FIAR_GAME_PLAYER_2_SYMBOL)
+		{
+			printf("Error: cannot undo previous move!\n");
+			return SP_FIAR_GAME_NO_HISTORY;
+		}
 	}
-	if (k == 1) // in case that the undo is after player's win.
-		src->currentPlayer = SP_FIAR_GAME_PLAYER_1_SYMBOL;
 
+	char symbol;
+	colNum = spArrayListGetLast(src->history);
+	rowNum = src->tops[colNum] - 1;
+
+	symbol = src->gameBoard[rowNum][colNum];
+	src->gameBoard[rowNum][colNum] = ' ';
+	spArrayListRemoveLast(src->history);
+	src->tops[colNum]--;
+
+	if (symbol == SP_FIAR_GAME_PLAYER_2_SYMBOL)
+	{
+		printf("Remove disc: remove computer's disc at column %d\n", colNum + 1);
+	}
+	else if (symbol == SP_FIAR_GAME_PLAYER_1_SYMBOL)
+	{
+		printf("Remove disc: remove user's disc at column %d\n", colNum + 1);
+	}
+
+
+	src->currentPlayer = SP_FIAR_GAME_PLAYER_1_SYMBOL;
 
 	return SP_FIAR_GAME_SUCCESS;
 
@@ -146,17 +173,15 @@ SP_FIAR_GAME_MESSAGE spFiarGameUndoPrevMove(SPFiarGame* src)
 
 SP_FIAR_GAME_MESSAGE spFiarGamePrintBoard(SPFiarGame* src)
 {
-	printf("\n"); // TODO: maybe remove
-
 	if (src == NULL)
 		return SP_FIAR_GAME_INVALID_ARGUMENT;
 
-	for (int i = 0; i < ROWS; i++)
+	for (int i = 0; i < SP_FIAR_GAME_N_ROWS; i++)
 	{
 		printf("| ");
-		for (int j = 0; j < COLUMNS; j++)
+		for (int j = 0; j < SP_FIAR_GAME_N_COLUMNS; j++)
 		{
-			printf("%c ", src->gameBoard[ROWS - i - 1][j]);
+			printf("%c ", src->gameBoard[SP_FIAR_GAME_N_ROWS - i - 1][j]);
 		}
 
 		printf("|\n");
@@ -173,8 +198,6 @@ char spFiarGameGetCurrentPlayer(SPFiarGame* src)
 	if (src == NULL)
 		return SP_FIAR_GAME_EMPTY_ENTRY;
 
-	//TODO: do we need to check if the game is over?
-
 	return src->currentPlayer;
 }
 
@@ -184,15 +207,15 @@ char spFiarCheckWinner(SPFiarGame* src)
 
 	if (score == INT_MAX)
 	{
-		return src->currentPlayer;
+		return SP_FIAR_GAME_PLAYER_1_SYMBOL;
 	}
 	else if (score == INT_MIN)
 	{
-		return getOtherPlayer(src);
+		return SP_FIAR_GAME_PLAYER_2_SYMBOL;
 	}
 	else if (isBoardFull(src))
 	{
-		return TIE_SYMBOL;
+		return SP_FIAR_GAME_TIE_SYMBOL;
 	}
 
 	return '\0';
@@ -200,20 +223,23 @@ char spFiarCheckWinner(SPFiarGame* src)
 
 char getOtherPlayer(SPFiarGame* src)
 {
-	return (src->currentPlayer == PLAYER_1_SYMBOL) ? PLAYER_2_SYMBOL : PLAYER_1_SYMBOL;
+	return (src->currentPlayer == SP_FIAR_GAME_PLAYER_1_SYMBOL) ? SP_FIAR_GAME_PLAYER_2_SYMBOL : SP_FIAR_GAME_PLAYER_1_SYMBOL;
 }
 
 bool isBoardFull(SPFiarGame* src)
 {
-	return fullColumnsCount(src) == COLUMNS;
+	return fullColumnsCount(src) == SP_FIAR_GAME_N_COLUMNS;
 }
 
 int fullColumnsCount(SPFiarGame* src)
 {
 	int result = 0;
 
-	for (int i = 0; i < COLUMNS; i++)
-		if (src->tops[i] == ROWS)
+	if (src == NULL)
+		return 0;
+
+	for (int i = 0; i < SP_FIAR_GAME_N_COLUMNS; i++)
+		if (src->tops[i] == SP_FIAR_GAME_N_ROWS)
 			result++;
 
 	return result;
