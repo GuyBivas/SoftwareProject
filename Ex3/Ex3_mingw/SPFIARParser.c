@@ -3,6 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+/**
+* Given an SP_COMMAND, this function returns the relevant string.
+*
+* @param c - the current SP_COMMAND
+* @return
+* a string suiting the recieved SP_COMMAND
+*/
 char* enumToString(SP_COMMAND c)
 {
 	switch (c)

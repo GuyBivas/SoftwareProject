@@ -1,71 +1,72 @@
 #include "SPMainAux.h"
 
-int main() {
-	SPFiarGame * curGame = NULL;
-	SPCommand curCommand;
-	int maxDepth = 0;
+int main()
+{
+	SPFiarGame* game = NULL;
+	SPCommand command;
+	int depth = 0;
 
 	while (true)
 	{
-		curGame = spFiarGameCreate(HISTORY_SIZE);
-		if (curGame == NULL)
-			endGame(curGame, true);
+		game = spFiarGameCreate(HISTORY_SIZE);
+		if (game == NULL)
+			exitGame(game, true);
 
-		maxDepth = getMaxDepth();
+		depth = getMaxDepth();
 
-		if (maxDepth == -1)
-			endGame(curGame, false);
-		else if (maxDepth == -2)
-			endGame(curGame, true);
+		if (depth == -2)
+			exitGame(game, true);
+		if (depth == -1)
+			exitGame(game, false);		
 
 		while (true)
 		{
-			if (spFiarCheckWinner(curGame) != '\0')
+			if (spFiarCheckWinner(game) != '\0')
 			{
-				spFiarGamePrintBoard(curGame);
-				printWinner(curGame);
-				curCommand = readCommand();
+				spFiarGamePrintBoard(game);
+				printWinner(spFiarCheckWinner(game));
+				command = getCommand();
 
-				while (curCommand.cmd != SP_RESTART && curCommand.cmd != SP_QUIT && curCommand.cmd != SP_UNDO_MOVE)
+				while (command.cmd != SP_QUIT && command.cmd != SP_UNDO_MOVE && command.cmd != SP_RESTART)
 				{
-					if (curCommand.cmd == SP_INVALID_LINE)
+					if (command.cmd == SP_INVALID_LINE)
 						printf("Error: invalid command\n");
 					else
 						printf("Error: the game is over\n");
 
-					curCommand = readCommand();
+					command = getCommand();
 				}
 
-				if (curCommand.cmd == SP_QUIT)
+				if (command.cmd == SP_QUIT)
 				{
-					endGame(curGame, false);
+					exitGame(game, false);
 				}
-				else if (curCommand.cmd == SP_RESTART)
+				else if (command.cmd == SP_RESTART)
 				{
-					spFiarGameDestroy(curGame);
+					spFiarGameDestroy(game);
 					break;
 				}
 				else
 				{
-					if (spFiarCheckWinner(curGame) != SP_FIAR_GAME_PLAYER_1_SYMBOL)
-						spFiarGameUndoPrevMove(curGame);
+					if (spFiarCheckWinner(game) != SP_FIAR_GAME_PLAYER_1_SYMBOL)
+						spFiarGameUndoPrevMove(game);
 
-					spFiarGameUndoPrevMove(curGame);
+					spFiarGameUndoPrevMove(game);
 					continue;
 				}
 			}
 
-			if (spFiarGameGetCurrentPlayer(curGame) == SP_FIAR_GAME_PLAYER_2_SYMBOL)
+			if (spFiarGameGetCurrentPlayer(game) == SP_FIAR_GAME_PLAYER_2_SYMBOL)
 			{
-				computerTurn(curGame, maxDepth);
+				makeComputerTurn(game, depth);
 				continue;
 			}
-			else
+			else if (spFiarGameGetCurrentPlayer(game) == SP_FIAR_GAME_PLAYER_1_SYMBOL)
 			{
-				spFiarGamePrintBoard(curGame);
+				spFiarGamePrintBoard(game);
 				printf("Please make the next move:\n");
 
-				if (doUserCommand(curGame, maxDepth) == -1)
+				if (makeUserTurn(game, depth) == -1)
 					break;
 				else
 					continue;

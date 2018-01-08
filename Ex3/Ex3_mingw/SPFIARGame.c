@@ -32,7 +32,7 @@ SPFiarGame* spFiarGameCreate(int historySize)
 	{
 		for (int j = 0; j < SP_FIAR_GAME_N_COLUMNS; j++)
 		{
-			game->gameBoard[i][j] = ' ';
+			game->gameBoard[i][j] = SP_FIAR_GAME_EMPTY_ENTRY;
 		}
 	}
 
@@ -115,7 +115,6 @@ bool spFiarGameIsValidMove(SPFiarGame* src, int col)
 	return src->tops[col] < SP_FIAR_GAME_N_ROWS;
 }
 
-// review
 SP_FIAR_GAME_MESSAGE spFiarGameUndoPrevMove(SPFiarGame* src)
 {
 	int rowNum, colNum;
@@ -151,7 +150,7 @@ SP_FIAR_GAME_MESSAGE spFiarGameUndoPrevMove(SPFiarGame* src)
 	rowNum = src->tops[colNum] - 1;
 
 	symbol = src->gameBoard[rowNum][colNum];
-	src->gameBoard[rowNum][colNum] = ' ';
+	src->gameBoard[rowNum][colNum] = SP_FIAR_GAME_EMPTY_ENTRY;
 	spArrayListRemoveLast(src->history);
 	src->tops[colNum]--;
 
@@ -168,7 +167,6 @@ SP_FIAR_GAME_MESSAGE spFiarGameUndoPrevMove(SPFiarGame* src)
 	src->currentPlayer = SP_FIAR_GAME_PLAYER_1_SYMBOL;
 
 	return SP_FIAR_GAME_SUCCESS;
-
 }
 
 SP_FIAR_GAME_MESSAGE spFiarGamePrintBoard(SPFiarGame* src)
