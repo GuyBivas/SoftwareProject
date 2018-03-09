@@ -34,7 +34,6 @@ typedef struct sp_fiar_game_t {
 	int tops[SP_FIAR_GAME_N_COLUMNS];
 	char currentPlayer;
 	SPArrayList* history;
-	//You May add any fields you like
 } SPFiarGame;
 
 /**
