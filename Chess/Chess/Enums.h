@@ -21,7 +21,39 @@ typedef enum {
 	NORMAL
 } GAME_STATUS;
 
+
+
+#pragma region Settings State
+
+typedef enum {
+	AMATEUR,
+	EASY,
+	MODERATE,
+	HARD,
+	EXPERT
+} GAME_DIFFICULTY;
+
+
+typedef enum {
+	ONE_PLAYER,
+	TWO_PLAYERS
+} PLAYER_MODE;
+
+
 #pragma endregion
+
+
+
+
+
+
+
+
+
+
+#pragma endregion
+
+
 
 // Type used for returning error codes from game functions
 typedef enum chess_game_message_t {

@@ -14,7 +14,6 @@ typedef struct chess_game {
 	ChessPiece gameBoard[8][8];
 	char currentPlayer;
 	ArrayList* history;
-
 } ChessGame;
 
 typedef struct chess_piece {
@@ -32,6 +31,8 @@ typedef struct move {
 	Position from;
 	Position to;
 } Move;
+
+
 
 #pragma endregion
 

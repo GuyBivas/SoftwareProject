@@ -114,11 +114,16 @@
     <ClCompile Include="ArrayList.c" />
     <ClCompile Include="ChessGame.c" />
     <ClCompile Include="main.c" />
+    <ClCompile Include="Parser.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ArrayList.h" />
     <ClInclude Include="ChessGame.h" />
     <ClInclude Include="Enums.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Chess.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
