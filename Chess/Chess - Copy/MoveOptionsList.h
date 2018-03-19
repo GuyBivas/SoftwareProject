@@ -1,6 +1,8 @@
-#ifndef ARRAYLIST_H_
-#define ARRAYLIST_H_
+#ifndef MOVEOPTIONSLIST_H_
+#define MOVEOPTIONSLIST_H_
+
 #include <stdbool.h>
+#include "Enums.h"
 
 /**
  * ArrayList summary:
@@ -36,21 +38,14 @@
  * ArrayListIsFull       - Returns if the array list reached its max capacity.
  * ArrayListIsEmpty      - Returns true if the array list contains no elements.
  */
-typedef struct array_list_t {
-	int* elements;
+
+typedef struct moveOption moveOption;
+
+typedef struct move_options_list {
+	moveOption** elements;
 	int actualSize;
 	int maxSize;
-} ArrayList;
-
-/**
- * A type used for errors
- */
-typedef enum array_list_message_t {
-	ARRAY_LIST_SUCCESS,
-	ARRAY_LIST_INVALID_ARGUMENT,
-	ARRAY_LIST_FULL,
-	ARRAY_LIST_EMPTY
-} ARRAY_LIST_MESSAGE;
+} MoveOptionsList;
 
 /**
  *  Creates an empty array list with the ecified maximum capacity.
@@ -59,35 +54,14 @@ typedef enum array_list_message_t {
  *  NULL, if an allocation error occurred or maxSize  <= 0.
  *  An instant of an array list otherwise.
  */
-ArrayList* ArrayListCreate(int maxSize);
-
-/**
- *	Creates an exact copy of the src array list. Elements in the new copy will
- *	be in the same order as they appeared in the source list.
- *	@param src - the source array list.
- *	@return
- *	NULL if either an allocation error occurs or src == NULL.
- *	A new copy of the source array list, otherwise.
- */
-ArrayList* ArrayListCopy(ArrayList* src);
+MoveOptionsList* arrayListCreate(int maxSize);
 
 /**
  * Frees all memory resources associated with the source array list. If the
  * source array is NULL, then the function does nothing.
  * @param src - the source array list
  */
-void ArrayListDestroy(ArrayList* src);
-
-/**
- * Clears all elements from the source array list. After invoking this function,
- * the size of the source list will be reduced to zero and maximum capacity is
- * not affected.
- * @param src - the source array list
- * @return
- * ARRAY_LIST_INVALID_ARGUMENT if src == NULL
- * ARRAY_LIST_SUCCESS otherwise
- */
-ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
+void arrayListDestroy(MoveOptionsList* src);
 
 /**
  * Inserts element at a ecified index. The elements residing at and after the
@@ -103,7 +77,7 @@ ARRAY_LIST_MESSAGE ArrayListClear(ArrayList* src);
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, int elem, int index);
+ARRAY_LIST_MESSAGE arrayListAddAt(MoveOptionsList* src, moveOption* elem, int index);
 
 /**
  * Inserts element at a the beginning of the source element. The elements
@@ -117,7 +91,7 @@ ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, int elem, int index);
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
- ARRAY_LIST_MESSAGE ArrayListAddFirst(ArrayList* src, int elem);
+ ARRAY_LIST_MESSAGE arrayListAddFirst(MoveOptionsList* src, moveOption* elem);
 
 /**
  * Inserts element at a the end of the source element. If the array list
@@ -130,7 +104,7 @@ ARRAY_LIST_MESSAGE ArrayListAddAt(ArrayList* src, int elem, int index);
  * ARRAY_LIST_FULL - if the source array list reached its maximum capacity
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, int elem);
+ARRAY_LIST_MESSAGE arrayListAddLast(MoveOptionsList* src, moveOption* elem);
 
 /**
  * Removes an element from a ecified index. The elements residing after the
@@ -145,7 +119,7 @@ ARRAY_LIST_MESSAGE ArrayListAddLast(ArrayList* src, int elem);
  * ARRAY_LIST_EMPTY - if the source array list is empty
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index);
+ARRAY_LIST_MESSAGE arrayListRemoveAt(MoveOptionsList* src, int index);
 
 /**
  * Removes an element from a the beginning of the list.
@@ -159,7 +133,7 @@ ARRAY_LIST_MESSAGE ArrayListRemoveAt(ArrayList* src, int index);
  * ARRAY_LIST_EMPTY - if the source array list is empty
  * ARRAY_LIST_SUCCESS - otherwise
  */
-ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
+ARRAY_LIST_MESSAGE arrayListRemoveFirst(MoveOptionsList* src);
 
 /**
  * Removes an element from a the end of the list.
@@ -173,7 +147,7 @@ ARRAY_LIST_MESSAGE ArrayListRemoveFirst(ArrayList* src);
  * ARRAY_LIST_EMPTY - if the source array list is empty
  * ARRAY_LIST_SUCCESS - otherwise.
  */
-ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
+ARRAY_LIST_MESSAGE arrayListRemoveLast(MoveOptionsList* src);
 
 /**
  * Returns the element at the ecified index. The function is called
@@ -185,7 +159,7 @@ ARRAY_LIST_MESSAGE ArrayListRemoveLast(ArrayList* src);
  * Undefined value if either src == NULL or index out of bound.
  * Otherwise, the element at the ecified index is returned.
  */
-int ArrayListGetAt(ArrayList* src, int index);
+int arrayListGetAt(MoveOptionsList* src, int index);
 
 /**
  * Returns the element at the beginning of the list. The function is called
@@ -196,7 +170,7 @@ int ArrayListGetAt(ArrayList* src, int index);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the beginning of the list is returned.
  */
-int ArrayListGetFirst(ArrayList* src);
+int arrayListGetFirst(MoveOptionsList* src);
 
 /**
  * Returns the element at the end of the list. The function is called
@@ -207,7 +181,7 @@ int ArrayListGetFirst(ArrayList* src);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the end of the list is returned.
  */
-int ArrayListGetLast(ArrayList* src);
+int arrayListGetLast(MoveOptionsList* src);
 
 /**
  * Returns the maximum capacity of the list. The function is called
@@ -218,7 +192,7 @@ int ArrayListGetLast(ArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the maximum capacity of the list is returned.
  */
-int ArrayListMaxCapacity(ArrayList* src);
+int arrayListMaxCapacity(MoveOptionsList* src);
 
 /**
  * Returns the number of elements in the list. The function is called
@@ -229,7 +203,7 @@ int ArrayListMaxCapacity(ArrayList* src);
  * Undefined value if either src == NULL
  * Otherwise, the number of the elements in the list is returned.
  */
-int ArrayListSize(ArrayList* src);
+int arrayListSize(MoveOptionsList* src);
 
 /**
  * Returns true if the list is full, that is the number of elements in the list
@@ -240,7 +214,7 @@ int ArrayListSize(ArrayList* src);
  * than its maximum capacity.
  * Otherwise, true is returned.
  */
-bool ArrayListIsFull(ArrayList* src);
+bool arrayListIsFull(MoveOptionsList* src);
 
 /**
  * Returns true if the list is empty, that is the number of elements in the list
@@ -250,6 +224,6 @@ bool ArrayListIsFull(ArrayList* src);
  * false if either src == NULL or the number of elements in the list is not zero.
  * Otherwise, true is returned.
  */
-bool ArrayListIsEmpty(ArrayList* src);
+bool arrayListIsEmpty(MoveOptionsList* src);
 
 #endif
