@@ -1,5 +1,5 @@
-#ifndef ENUMS_H_
-#define ENUMS_H_
+#ifndef ENUMS_H
+#define ENUMS_H
 
 #pragma region Game State
 

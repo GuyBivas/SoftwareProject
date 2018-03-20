@@ -113,6 +113,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ChessLogic.c" />
     <ClCompile Include="HistoryCircularArray.c" />
     <ClCompile Include="MoveOptionsList.c" />
     <ClCompile Include="ChessGame.c" />
@@ -120,15 +121,12 @@
     <ClCompile Include="Parser.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ChessLogic.h" />
     <ClInclude Include="HistoryCircularArray.h" />
     <ClInclude Include="MoveOptionsList.h" />
     <ClInclude Include="ChessGame.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Parser.h" />
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Chess.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

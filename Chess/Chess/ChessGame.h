@@ -1,9 +1,10 @@
-#ifndef CHESSGAME_H_
-#define CHESSGAME_H_
+#ifndef CHESSGAME_H
+#define CHESSGAME_H
 
 #include <stdbool.h>
 #include "Enums.h"
 #include "MoveOptionsList.h"
+#include "HistoryCircularArray.h"
 
 //Definitions
 #define _FIAR_GAME_PLAYER_1_SYMBOL 'X'
@@ -11,12 +12,10 @@
 
 #pragma region Structs
 
-typedef struct chess_game {
-	ChessPiece* gameBoard[8][8];
-	PLAYER_COLOR currentPlayer;
-	MoveOptionsList* history;
-	GAME_STATUS status;
-} ChessGame;
+typedef struct position {
+	int x;
+	int y;
+} Position;
 
 typedef struct chess_piece {
 	PIECE_TYPE type;
@@ -24,10 +23,12 @@ typedef struct chess_piece {
 	Position position;
 } ChessPiece;
 
-typedef struct position {
-	int x;
-	int y;
-} Position;
+typedef struct chess_game {
+	ChessPiece* gameBoard[8][8];
+	PLAYER_COLOR currentPlayer;
+	HistoryCircularArray* history;
+	GAME_STATUS status;
+} ChessGame;
 
 typedef struct move {
 	Position from;

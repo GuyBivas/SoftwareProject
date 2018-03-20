@@ -32,7 +32,6 @@ MoveOptionsList* arrayListCreate(int maxSize)
 	}
 }
 
-
 void arrayListDestroy(MoveOptionsList* src)
 {
 	if (src != NULL)
@@ -109,7 +108,7 @@ ARRAY_LIST_MESSAGE arrayListRemoveLast(MoveOptionsList* src)
 	return arrayListRemoveAt(src, (src->actualSize) - 1);
 }
 
-int arrayListGetAt(MoveOptionsList* src, int index)
+moveOption* arrayListGetAt(MoveOptionsList* src, int index)
 {
 	if (src == NULL)
 		return 0;
@@ -120,12 +119,12 @@ int arrayListGetAt(MoveOptionsList* src, int index)
 	return src->elements[index];
 }
 
-int arrayListGetFirst(MoveOptionsList* src)
+moveOption* arrayListGetFirst(MoveOptionsList* src)
 {
 	return src->elements[0];
 }
 
-int arrayListGetLast(MoveOptionsList* src)
+moveOption* arrayListGetLast(MoveOptionsList* src)
 {
 	return src->elements[src->actualSize - 1];
 }
@@ -148,4 +147,13 @@ bool arrayListIsFull(MoveOptionsList* src)
 bool arrayListIsEmpty(MoveOptionsList* src)
 {
 	return src->actualSize == 0;
+}
+
+bool arrayListContains(MoveOptionsList* src, moveOption* elem)
+{
+	return false;
+	/*for (int i = 0; i < src->actualSize; i++)
+	{
+		if (src->elements[i]->pos == elem->pos)
+	}*/
 }

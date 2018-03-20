@@ -1,5 +1,5 @@
-#ifndef MOVEOPTIONSLIST_H_
-#define MOVEOPTIONSLIST_H_
+#ifndef MOVEOPTIONSLIST_H
+#define MOVEOPTIONSLIST_H
 
 #include <stdbool.h>
 #include "Enums.h"
@@ -159,7 +159,7 @@ ARRAY_LIST_MESSAGE arrayListRemoveLast(MoveOptionsList* src);
  * Undefined value if either src == NULL or index out of bound.
  * Otherwise, the element at the ecified index is returned.
  */
-int arrayListGetAt(MoveOptionsList* src, int index);
+moveOption* arrayListGetAt(MoveOptionsList* src, int index);
 
 /**
  * Returns the element at the beginning of the list. The function is called
@@ -170,7 +170,7 @@ int arrayListGetAt(MoveOptionsList* src, int index);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the beginning of the list is returned.
  */
-int arrayListGetFirst(MoveOptionsList* src);
+moveOption* arrayListGetFirst(MoveOptionsList* src);
 
 /**
  * Returns the element at the end of the list. The function is called
@@ -181,7 +181,7 @@ int arrayListGetFirst(MoveOptionsList* src);
  * Undefined value if either src == NULL or the list is empty
  * Otherwise, the element at the end of the list is returned.
  */
-int arrayListGetLast(MoveOptionsList* src);
+moveOption* arrayListGetLast(MoveOptionsList* src);
 
 /**
  * Returns the maximum capacity of the list. The function is called
@@ -225,5 +225,7 @@ bool arrayListIsFull(MoveOptionsList* src);
  * Otherwise, true is returned.
  */
 bool arrayListIsEmpty(MoveOptionsList* src);
+
+bool arrayListContains(MoveOptionsList* src, moveOption* elem);
 
 #endif

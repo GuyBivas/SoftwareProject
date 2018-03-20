@@ -1,13 +1,11 @@
-#ifndef HISTORYCIRCULARARRAY_H_
-#define HISTORYCIRCULARARRAY_H_
+#ifndef HISTORYCIRCULARARRAY_H
+#define HISTORYCIRCULARARRAY_H
 
 #include <stdbool.h>
 #include "Enums.h"
 
-typedef struct ChessGame ChessGame;
-
 typedef struct history_circular_array {
-	ChessGame** elements;
+	struct ChessGame** elements;
 	int actualSize;
 	int maxSize;
 	int index;
@@ -17,10 +15,10 @@ HistoryCircularArray* circularArrayCreate(int maxSize);
 
 void circularArrayDestroy(HistoryCircularArray* src);
 
-void circularArrayAdd(HistoryCircularArray* src, ChessGame* elem);
+void circularArrayAdd(HistoryCircularArray* src, struct ChessGame* elem);
 
 ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src);
 
-ChessGame* circularArrayGetCurrent(HistoryCircularArray* src);
+struct ChessGame* circularArrayGetCurrent(HistoryCircularArray* src);
 
 #endif
