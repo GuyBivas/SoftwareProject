@@ -38,22 +38,52 @@ void circularArrayDestroy(HistoryCircularArray * src)
 	if (src != NULL)
 	{
 		if (src->elements != NULL)
+		{
+			for (int i = 0; i < src->actualSize; i++)
+			{
+				free(src->elements[i]);
+			}
+
 			free(src->elements);
+		}
 
 		free(src);
 	}
 }
 
-void circularArrayAdd(HistoryCircularArray * src, ChessGame * elem)
+ChessGame* circularArrayGetCurrent(HistoryCircularArray* src)
 {
+	if (src->actualSize == 0)
+		return NULL;
+
+	return src->elements[src->index - 1];
 }
 
-ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray * src)
+void circularArrayAdd(HistoryCircularArray* src, ChessGame* elem)
 {
-	return ARRAY_LIST_SUCCESS;
+	src->elements[src->index] = elem;
+
+	src->index++;
+	if (src->index >= src->maxSize)
+		src->index = 0;
+
+	src->actualSize++;
+	if (src->actualSize > src->maxSize)
+		src->actualSize = src->maxSize;
 }
 
-int circularArrayGetCurrent(HistoryCircularArray * src)
+ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src)
 {
-	return 0;
+	if (src->actualSize == 0)
+		return ARRAY_LIST_EMPTY;
+
+	src->index--;
+	if (src->index < 0)
+		src->index = src->maxSize - 1;
+
+	src->actualSize--;
+	if (src->actualSize < 0)
+		src->actualSize = 0;
+
+	free(src->elements[src->index]); // decreased index 
 }

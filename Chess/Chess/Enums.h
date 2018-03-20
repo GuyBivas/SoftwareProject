@@ -27,7 +27,6 @@ typedef enum {
 
 #pragma endregion
 
-
 #pragma region Settings State
 
 typedef enum {
@@ -44,13 +43,7 @@ typedef enum {
 	TWO_PLAYERS
 } PLAYER_MODE;
 
-
-
-
-
-
 #pragma endregion
-
 
 #pragma region Commands
 //a type used to represent a command
@@ -75,7 +68,6 @@ typedef enum {
 } COMMAND;
 
 #pragma endregion
-
 
 // Type used for returning error codes from game functions
 typedef enum chess_game_message_t {

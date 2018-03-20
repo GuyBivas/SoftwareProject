@@ -21,6 +21,6 @@ void circularArrayAdd(HistoryCircularArray* src, ChessGame* elem);
 
 ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src);
 
-int circularArrayGetCurrent(HistoryCircularArray* src);
+ChessGame* circularArrayGetCurrent(HistoryCircularArray* src);
 
 #endif

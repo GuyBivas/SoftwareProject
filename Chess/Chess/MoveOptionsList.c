@@ -38,11 +38,14 @@ void arrayListDestroy(MoveOptionsList* src)
 	if (src != NULL)
 	{
 		if (src->elements != NULL)
-			/*for (int i = 0; i < src->actualSize; i++)
+		{
+			for (int i = 0; i < src->actualSize; i++)
 			{
+				free(src->elements[i]);
+			}
 
-			}*/
 			free(src->elements);
+		}
 
 		free(src);
 	}

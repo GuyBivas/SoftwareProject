@@ -1,5 +1,6 @@
-#ifndef ChessGame_H_
-#define ChessGame_H_
+#ifndef CHESSGAME_H_
+#define CHESSGAME_H_
+
 #include <stdbool.h>
 #include "Enums.h"
 #include "MoveOptionsList.h"
