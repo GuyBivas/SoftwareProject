@@ -47,7 +47,7 @@ ChessGame* gameCreate(int historySize)
 	if (historySize <= 0) //TODO: check if needed
 		return NULL;
 
-	ChessGame* game = (ChessGame*)calloc(sizeof(ChessGame));
+	ChessGame* game = (ChessGame*)malloc(sizeof(ChessGame));
 
 	if (game == NULL)
 		return NULL;
@@ -237,7 +237,7 @@ CHESS_GAME_MESSAGE gameMakeMove(ChessGame* src, Move move)
 {
 	ChessGame* copy = gameCopy(src);
 
-	if (!(gameIsValidMove(src, move)))
+	if (!(logicIsValidMove(src, move)))
 		return CHESS_GAME_INVALID_MOVE;
 
 	circularArrayAdd(src->history, copy);

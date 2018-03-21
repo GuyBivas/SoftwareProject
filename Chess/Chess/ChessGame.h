@@ -11,14 +11,13 @@
 #define _FIAR_GAME_PLAYER_1_SYMBOL 'X'
 #define _FIAR_GAME_PLAYER_2_SYMBOL 'O'
 
-
 ChessGame* gameCreate(int historySize);
 
 ChessGame* gameCopy(ChessGame* src);
 
 void gameDestroy(ChessGame* src);
 
-MoveOptionsList* gameGetMoves(ChessGame* src, Position pos);
+MoveOptionsList* gameGetValidMoves(ChessGame* src, Position pos);
 
 CHESS_GAME_MESSAGE gameMakeMove(ChessGame* src, Move move);
 
