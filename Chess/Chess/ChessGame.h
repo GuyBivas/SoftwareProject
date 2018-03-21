@@ -28,6 +28,8 @@ typedef struct chess_game {
 	PLAYER_COLOR currentPlayer;
 	HistoryCircularArray* history;
 	GAME_STATUS status;
+	ChessPiece* whiteKing;
+	ChessPiece* blackKing;
 } ChessGame;
 
 typedef struct move {

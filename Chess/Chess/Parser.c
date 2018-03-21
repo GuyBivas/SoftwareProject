@@ -193,6 +193,7 @@ ParsedCommand ParserPraseLine(const char* str)
 			output.validArg = false;
 	}
 
+	return output;
 }
 
 
