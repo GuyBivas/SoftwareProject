@@ -11,6 +11,7 @@
 #define _FIAR_GAME_PLAYER_1_SYMBOL 'X'
 #define _FIAR_GAME_PLAYER_2_SYMBOL 'O'
 
+
 ChessGame* gameCreate(int historySize);
 
 ChessGame* gameCopy(ChessGame* src);
