@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include "MoveOptionsList.h"
 
+//typedef struct moveOption moveOption;
+
 MoveOptionsList* arrayListCreate(int maxSize)
 {
 	MoveOptionsList* newList = (MoveOptionsList*)malloc(sizeof(MoveOptionsList));
@@ -149,11 +151,13 @@ bool arrayListIsEmpty(MoveOptionsList* src)
 	return src->actualSize == 0;
 }
 
-bool arrayListContains(MoveOptionsList* src, moveOption* elem)
-{
-	return false;
-	/*for (int i = 0; i < src->actualSize; i++)
-	{
-		if (src->elements[i]->pos == elem->pos)
-	}*/
-}
+//bool arrayListContains(MoveOptionsList* src, Position pos)
+//{
+//	for (int i = 0; i < src->actualSize; i++)
+//	{
+//		if ((src->elements[i])->pos.x == pos.x && (src->elements[i])->pos.y == pos.y)
+//			return true;
+//	}
+//
+//	return false;
+//}

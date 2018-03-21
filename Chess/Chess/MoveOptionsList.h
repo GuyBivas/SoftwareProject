@@ -226,6 +226,6 @@ bool arrayListIsFull(MoveOptionsList* src);
  */
 bool arrayListIsEmpty(MoveOptionsList* src);
 
-bool arrayListContains(MoveOptionsList* src, moveOption* elem);
+//bool arrayListContains(MoveOptionsList* src, Position pos);
 
 #endif

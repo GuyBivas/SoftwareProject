@@ -63,6 +63,9 @@ ChessGame* circularArrayGetCurrent(HistoryCircularArray* src)
 
 void circularArrayAdd(HistoryCircularArray* src, ChessGame* elem)
 {
+	if (src->actualSize == src->maxSize)
+		free(src->elements[src->index]);
+
 	src->elements[src->index] = elem;
 
 	src->index++;
@@ -87,5 +90,6 @@ ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src)
 	if (src->actualSize < 0)
 		src->actualSize = 0;
 
-	free(src->elements[src->index]); // decreased index 
+	free(src->elements[src->index]); // decreased index
+	return ARRAY_LIST_SUCCESS;
 }

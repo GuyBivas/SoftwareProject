@@ -192,7 +192,8 @@ ParsedCommand ParserPraseLine(const char* str)
 		if (isValidLocation(word) == false)
 			output.validArg = false;
 	}
-
+	
+	return output;
 }
 
 
