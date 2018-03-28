@@ -16,40 +16,36 @@ char* enumToStringSC(COMMAND c)
 	switch (c)
 	{
 		//Settings command
-	case GAME_MODE:
+	case COMMAND_GAME_MODE:
 		return "game_mode";
-	case DIFFICULTY:
+	case COMMAND_DIFFICULTY:
 		return "difficulty";
-	case USER_COLOR:
+	case COMMAND_USER_COLOR:
 		return "user_color";
-	case LOAD:
+	case COMMAND_LOAD:
 		return "load";
-	case DEFAULT:
+	case COMMAND_DEFAULT:
 		return "default";
-	case QUIT:
+	case COMMAND_QUIT:
 		return "quit";
-	case START:
+	case COMMAND_START:
 		return "start";
 		// game commands: 
-	case MOVE:
+	case COMMAND_MOVE:
 		return "move";
-	case GET_MOVES:
+	case COMMAND_GET_MOVES:
 		return "get_moves";
-	case SAVE:
+	case COMMAND_SAVE:
 		return "save";
-	case UNDO:
+	case COMMAND_UNDO:
 		return "undo";
-	case RESET:
+	case COMMAND_RESET:
 		return "reset";
 
 	default:
 		return "notcmd";
 	}
 }
-
-
-
-
 
 bool spParserIsInt(const char* str)
 {
@@ -62,8 +58,6 @@ bool spParserIsInt(const char* str)
 	return true;
 }
 
-
-
 ParsedCommand ParserPraseLine(const char* str)
 {
 	ParsedCommand output;
@@ -71,7 +65,7 @@ ParsedCommand ParserPraseLine(const char* str)
 	char copy[2048];
 	char* to = "to";
 
-	output.cmd = INVALID_LINE;
+	output.cmd = COMMAND_INVALID_LINE;
 	strcpy(copy, str);
 	word = strtok(copy, " \t\r\n");
 
@@ -81,7 +75,7 @@ ParsedCommand ParserPraseLine(const char* str)
 			output.cmd = command;
 	}
 
-	if (output.cmd == GAME_MODE)
+	if (output.cmd == COMMAND_GAME_MODE)
 	{
 		word = strtok(NULL, " \t\r\n");
 		if (word == NULL)
@@ -97,7 +91,7 @@ ParsedCommand ParserPraseLine(const char* str)
 				output.validArg = false;
 		}
 	}
-	if (output.cmd == DIFFICULTY)
+	if (output.cmd == COMMAND_DIFFICULTY)
 	{
 		word = strtok(NULL, " \t\r\n");
 		if (word == NULL)
@@ -113,7 +107,7 @@ ParsedCommand ParserPraseLine(const char* str)
 				output.validArg = false;
 		}
 	}
-	if (output.cmd == USER_COLOR)
+	if (output.cmd == COMMAND_USER_COLOR)
 	{
 		word = strtok(NULL, " \t\r\n");
 		if (word == NULL)
@@ -129,7 +123,7 @@ ParsedCommand ParserPraseLine(const char* str)
 				output.validArg = false;
 		}
 	}
-	if (output.cmd == LOAD)//only checks that the path string is not NULL
+	if (output.cmd == COMMAND_LOAD)//only checks that the path string is not NULL
 	{
 		word = strtok(NULL, " \t\r\n");
 		if (word != NULL )
@@ -140,7 +134,7 @@ ParsedCommand ParserPraseLine(const char* str)
 		else
 			output.validArg = false;
 	}
-	if (output.cmd == SAVE)
+	if (output.cmd == COMMAND_SAVE)
 	{
 		word = strtok(NULL, " \t\r\n");
 		if (word == NULL)
@@ -152,7 +146,7 @@ ParsedCommand ParserPraseLine(const char* str)
 		}
 
 	}
-	if (output.cmd == MOVE)
+	if (output.cmd == COMMAND_MOVE)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -184,7 +178,7 @@ ParsedCommand ParserPraseLine(const char* str)
 
 	//return output;
 	}
-	if (output.cmd == GET_MOVES)
+	if (output.cmd == COMMAND_GET_MOVES)
 	{
 		word = strtok(NULL, " \t\r\n");
 		if (word == NULL)

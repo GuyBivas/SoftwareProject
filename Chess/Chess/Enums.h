@@ -18,12 +18,11 @@ typedef enum {
 } PLAYER_COLOR;
 
 typedef enum {
-	CHECK,
-	MATE,
-	DRAW,
-	NORMAL
+	STATUS_CHECK,
+	STATUS_MATE,
+	STATUS_DRAW,
+	STATUS_NORMAL
 } GAME_STATUS;
-
 
 #pragma endregion
 
@@ -37,7 +36,6 @@ typedef enum {
 	EXPERT
 } GAME_DIFFICULTY;
 
-
 typedef enum {
 	ONE_PLAYER,
 	TWO_PLAYERS
@@ -49,21 +47,21 @@ typedef enum {
 //a type used to represent a command
 typedef enum {
 	// settings state:
-	GAME_MODE,
-	DIFFICULTY,
-	USER_COLOR,
-	LOAD,
-	DEFAULT,
-	PRINT_SETTINGS,
-	START,
+	COMMAND_GAME_MODE,
+	COMMAND_DIFFICULTY,
+	COMMAND_USER_COLOR,
+	COMMAND_LOAD,
+	COMMAND_DEFAULT,
+	COMMAND_PRINT_SETTINGS,
+	COMMAND_START,
 	//game state:
-	MOVE,
-	GET_MOVES,
-	SAVE,
-	UNDO,
-	RESET,
-	QUIT,
-	INVALID_LINE
+	COMMAND_MOVE,
+	COMMAND_GET_MOVES,
+	COMMAND_SAVE,
+	COMMAND_UNDO,
+	COMMAND_RESET,
+	COMMAND_QUIT,
+	COMMAND_INVALID_LINE
 
 } COMMAND;
 
@@ -76,7 +74,6 @@ typedef enum chess_game_message_t {
 	CHESS_GAME_NO_HISTORY,
 	CHESS_GAME_SUCCESS,
 } CHESS_GAME_MESSAGE;
-
 
 /**
 * A type used for errors

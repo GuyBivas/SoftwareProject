@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "ChessGame.h"
@@ -9,7 +8,7 @@
 MoveOptionsList* gameGetValidMoves(ChessGame* src, Position pos)
 {
 	MoveOptionsList* validMoves = arrayListCreate(8 * 4 - 3); // 8*4-3 is the maximum possible moves for a queen
-	ChessPiece* piece = src->gameBoard[pos.y][pos.x];
+	ChessPiece* piece = gameGetPieceAt(src, pos);
 
 	if (piece == NULL)
 		return validMoves;
@@ -18,19 +17,13 @@ MoveOptionsList* gameGetValidMoves(ChessGame* src, Position pos)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			Position p;
-			Move move;
-
-			p.y = i;
-			p.x = j;
-
-			move.from = pos;
-			move.to = p;
-			if (logicIsValidMove(src, move))
+			Position p = newPos(i, j);
+			
+			if (logicIsValidMove(src, newMove(pos, p)))
 			{
 				moveOption* moveOpt = (moveOption*)malloc(sizeof(moveOption));
 				moveOpt->pos = p;
-				moveOpt->isCapturing = (src->gameBoard[i][j] != NULL); // move to a pos of other pieace is always capturing (must be other color if valid)
+				moveOpt->isCapturing = (gameGetPieceAt(src, p) != NULL); // move to a pos of other pieace is always capturing (must be other color if valid)
 				moveOpt->isThreatened = logicCheckThreatened(src, p, piece->color);
 				arrayListAddLast(validMoves, moveOpt);
 			}
@@ -39,8 +32,6 @@ MoveOptionsList* gameGetValidMoves(ChessGame* src, Position pos)
 
 	return validMoves;
 }
-
-
 
 ChessGame* gameCreate(int historySize)
 {
@@ -52,9 +43,10 @@ ChessGame* gameCreate(int historySize)
 	if (game == NULL)
 		return NULL;
 
+	game->status = STATUS_NORMAL;
 	game->history = circularArrayCreate(historySize);
 
-	if (game->history != NULL)
+	if (game->history == NULL)
 	{
 		free(game);
 		return NULL;
@@ -65,49 +57,51 @@ ChessGame* gameCreate(int historySize)
 		for (int j = 0; j < 8; j++)
 		{
 			game->gameBoard[i][j] = NULL;
-			if ((i >= 0 && i <= 1) || (i >= 6 && i <= 7))
+			if (j <= 1 || j >= 6)
 			{
-				game->gameBoard[i][j] = (ChessPiece*)malloc(sizeof(ChessPiece));
-				game->gameBoard[i][j]->position.x = j;
-				game->gameBoard[i][j]->position.y = i;
-				if (i == 1 || i == 2)
-					game->gameBoard[i][j]->color = WHITE;
+				Position pos = newPos(i, j);
+				ChessPiece* piece = (ChessPiece*)malloc(sizeof(ChessPiece));
+				if (piece == NULL)
+					return NULL;
+
+				piece->position = pos;
+				gameSetPieceAt(game, pos, piece);
+
+				if (j == 0 || j == 1)
+					piece->color = WHITE;
 				else
-					game->gameBoard[i][j]->color = BLACK;
+					piece->color = BLACK;
 
-
-				if (i == 0 || i == 7)
+				if (j == 1 || j == 6)
 				{
-					if (j == 0 || j == 7)
-						game->gameBoard[i][j]->type = ROOK;
-					else if (j == 1 || j == 6)
-						game->gameBoard[i][j]->type = KNIGHT;
-					else if (j == 2 || j == 5)
-						game->gameBoard[i][j]->type = BISHOP;
-					else if (j == 3)
-						game->gameBoard[i][j]->type = QUEEN;
-					else
-					{
-						game->gameBoard[i][j]->type = KING;
-						if (game->gameBoard[i][j]->color == WHITE)
-							game->whiteKing = game->gameBoard[i][j];
-						else
-							game->blackKing = game->gameBoard[i][j];
-					}
+					piece->type = PAWN;
 				}
 				else
-					game->gameBoard[i][j]->type = PAWN;
+				{
+					if (i == 0 || i == 7)
+						piece->type = ROOK;
+					else if (i == 1 || i == 6)
+						piece->type = KNIGHT;
+					else if (i == 2 || i == 5)
+						piece->type = BISHOP;
+					else if (i == 4)
+						piece->type = QUEEN;
+					else if (i == 3)
+					{
+						piece->type = KING;
 
+						if (piece->color == WHITE)
+							game->whiteKing = piece;
+						else
+							game->blackKing = piece;
+					}
+				}
 			}
-
 		}
 	}
 
 	return game;
 }
-
-
-
 
 ChessGame* gameCopy(ChessGame* src)
 {
@@ -133,8 +127,6 @@ ChessGame* gameCopy(ChessGame* src)
 	return copy;
 }
 
-
-
 void gameDestroy(ChessGame* src)
 {
 	if (src == NULL)
@@ -153,116 +145,81 @@ void gameDestroy(ChessGame* src)
 	free(src);
 }
 
-
-
-
 void printPiece(ChessPiece* piece)
 {
+	char c;
+
 	if (piece == NULL)
-		printf("_");
-	if (piece->type == PAWN)
 	{
-		if (piece->color == WHITE)
-			printf("p");
-		else
-			printf("P");
+		printf("_ ");
+		return;
 	}
-	if (piece->type == KNIGHT)
+
+	switch (piece->type)
 	{
-		if (piece->color == WHITE)
-			printf("n");
-		else
-			printf("N");
+	case PAWN:
+		c = 'P';
+		break;
+	case KNIGHT:
+		c = 'N';
+		break;
+	case ROOK:
+		c = 'R';
+		break;
+	case BISHOP:
+		c = 'B';
+		break;
+	case QUEEN:
+		c = 'Q';
+		break;
+	case KING:
+		c = 'K';
+		break;
 	}
-	if (piece->type == ROOK)
-	{
-		if (piece->color == WHITE)
-			printf("r");
-		else
-			printf("R");
-	}
-	if (piece->type == QUEEN)
-	{
-		if (piece->color == WHITE)
-			printf("q");
-		else
-			printf("Q");
-	}
-	if (piece->type == KING)
-	{
-		if (piece->color == WHITE)
-			printf("k");
-		else
-			printf("K");
-	}
-	if (piece->type == BISHOP)
-	{
-		if (piece->color == WHITE)
-			printf("b");
-		else
-			printf("B");
-	}
+
+	if (piece->color == WHITE)
+		c += 'a' - 'A';
+
+	printf("%c ", c);
 }
-
-
 
 CHESS_GAME_MESSAGE gamePrintBoard(ChessGame* src)
 {
 	if (src == NULL)
 		return CHESS_GAME_INVALID_ARGUMENT;
 
-	for (int i = 0; i < 8; i++)
+	for (int j = 7; j >=0; j--)
 	{
-		printf("%d| ", i);
-		for (int j = 0; j < 8; j++)
+		printf("%d| ", j+1);
+		for (int i = 0; i < 8; i++)
 		{
-			printPiece(src->gameBoard[8 - i - 1][j]);
+			printPiece(gameGetPieceAt(src, newPos(i, j)));
 		}
 
 		printf("|\n");
 	}
 
-	printf("-----------------\n");
+	printf("  -----------------\n");
 	printf("   A B C D E F G H\n");
 
 	return CHESS_GAME_SUCCESS;
 }
 
-
-
-
-
-
-CHESS_GAME_MESSAGE gameMakeMove(ChessGame* src, Move move)
+bool gameMakeMove(ChessGame* src, Move move)
 {
-	ChessGame* copy = gameCopy(src);
+	if (logicIsValidMove(src, move) == false)
+		return false;
 
-	if (!(logicIsValidMove(src, move)))
-		return CHESS_GAME_INVALID_MOVE;
+	circularArrayAdd(src->history, gameCopy(src));
 
-	circularArrayAdd(src->history, copy);
+	gameMovePiece(src, move);
+	logicUpdateGameStatus(src);
 
-	if (src->gameBoard[move.to.y][move.to.x] != NULL)//delete captured piece
-		free(src->gameBoard[move.to.y][move.to.x]);
+	if (src->status == STATUS_NORMAL)
+		src->currentPlayer = (src->currentPlayer == WHITE) ? BLACK : WHITE;
 
-
-	src->gameBoard[move.to.y][move.to.x] = src->gameBoard[move.from.y][move.from.x];
-	src->gameBoard[move.to.y][move.to.x]->position.y = move.to.y;
-	src->gameBoard[move.to.y][move.to.x]->position.x = move.to.x;
-	src->gameBoard[move.from.y][move.from.x] = NULL;
-	src->currentPlayer = 1 - (src->currentPlayer);
-
-	return CHESS_GAME_SUCCESS;
+	return true;
 }
-
-
-
-bool gameIsValidMove(ChessGame * src, Move move)
-{
-	return false;
-}
-
-
 
 CHESS_GAME_MESSAGE gameUndoPrevMove(ChessGame* src)
 {

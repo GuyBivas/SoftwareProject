@@ -1,14 +1,11 @@
-#ifndef SPFIARPARSER_H_
-#define SPFIARPARSER_H_
+#ifndef PARSER_H
+#define PARSER_H
+
 #include <stdbool.h>
 #include "Enums.h"
 
 //specify the maximum line length
-#define SP_MAX_LINE_LENGTH 2048
-
-
-
-
+#define MAX_LINE_LENGTH 2048
 
 //a new type that is used to encapsulate a parsed line
 typedef struct command_t {
@@ -16,9 +13,6 @@ typedef struct command_t {
 	bool validArg; //is set to true if the line contains a valid argument
 	char* arg;
 } ParsedCommand;
-
-
-
 
 /**
 * Checks if a specified string represents a valid integer. It is recommended

@@ -25,6 +25,7 @@ typedef struct chess_game {
 	GAME_STATUS status;
 	ChessPiece* whiteKing;
 	ChessPiece* blackKing;
+	PLAYER_MODE mode;
 } ChessGame;
 
 typedef struct move {
@@ -43,5 +44,11 @@ typedef struct moveOption {
 bool logicIsValidMove(ChessGame* src, Move move);
 bool logicCheckThreatened(ChessGame* src, Position pos, PLAYER_COLOR currColor);
 void logicUpdateGameStatus(ChessGame* src);
+ChessPiece* gameGetPieceAt(ChessGame* src, Position pos);
+void gameSetPieceAt(ChessGame* src, Position pos, ChessPiece* newPiece);
+void gameMovePiece(ChessGame* src, Move move);
+bool gameIsInBoard(Position pos);
+Move newMove(Position from, Position to);
+Position newPos(int x, int y);
 
 #endif
