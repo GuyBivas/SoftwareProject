@@ -68,17 +68,23 @@ typedef enum {
 #pragma endregion
 
 // Type used for returning error codes from game functions
-typedef enum chess_game_message_t {
+typedef enum {
 	CHESS_GAME_INVALID_MOVE,
 	CHESS_GAME_INVALID_ARGUMENT,
 	CHESS_GAME_NO_HISTORY,
 	CHESS_GAME_SUCCESS,
 } CHESS_GAME_MESSAGE;
 
-/**
-* A type used for errors
-*/
-typedef enum array_list_message_t {
+typedef enum {
+	IVMR_VALID,
+	IVMR_INVALID_POSITION,
+	IVMR_NO_PIECE_IN_POS,
+	IVMR_ILLEGAL_MOVE,
+	IVMR_KING_STILL_THREATENED,
+	IVMR_KING_GET_THREATENED,
+} IS_VALID_MOVE_RESULT;
+
+typedef enum {
 	ARRAY_LIST_SUCCESS,
 	ARRAY_LIST_INVALID_ARGUMENT,
 	ARRAY_LIST_FULL,

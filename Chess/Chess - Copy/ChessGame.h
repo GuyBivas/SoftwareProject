@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include "Enums.h"
 #include "MoveOptionsList.h"
-#include "ChessLogic.h"
 
 
 //Definitions

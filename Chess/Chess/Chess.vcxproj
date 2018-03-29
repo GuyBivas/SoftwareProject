@@ -113,7 +113,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ChessLogic.c" />
     <ClCompile Include="HistoryCircularArray.c" />
     <ClCompile Include="MoveOptionsList.c" />
     <ClCompile Include="ChessGame.c" />
@@ -121,7 +120,6 @@
     <ClCompile Include="Parser.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChessLogic.h" />
     <ClInclude Include="HistoryCircularArray.h" />
     <ClInclude Include="MoveOptionsList.h" />
     <ClInclude Include="ChessGame.h" />

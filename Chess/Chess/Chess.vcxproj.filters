@@ -30,9 +30,6 @@
     <ClCompile Include="Parser.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChessLogic.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChessGame.h">
@@ -48,9 +45,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ChessLogic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
