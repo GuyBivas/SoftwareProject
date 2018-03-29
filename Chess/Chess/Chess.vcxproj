@@ -114,6 +114,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="HistoryCircularArray.c" />
+    <ClCompile Include="MainAux.c" />
     <ClCompile Include="MoveOptionsList.c" />
     <ClCompile Include="ChessGame.c" />
     <ClCompile Include="main.c" />
@@ -121,6 +122,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="HistoryCircularArray.h" />
+    <ClInclude Include="MainAux.h" />
     <ClInclude Include="MoveOptionsList.h" />
     <ClInclude Include="ChessGame.h" />
     <ClInclude Include="Enums.h" />

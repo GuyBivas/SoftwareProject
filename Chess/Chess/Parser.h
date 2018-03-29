@@ -40,5 +40,6 @@ bool spParserIsInt(const char* str);
 ParsedCommand ParserPraseLine(const char* str);
 bool isValidLocation(const char *word);
 bool FileExists(const char *path);
-
+char* difficultyArgPrint(char* c);
+char* enumArgToString(ParsedCommand c);
 #endif

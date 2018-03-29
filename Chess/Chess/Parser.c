@@ -47,6 +47,63 @@ char* enumToStringSC(COMMAND c)
 	}
 }
 
+
+
+
+char* enumArgToString(ParsedCommand c)
+{
+	switch (c.cmd)
+	{
+		//Settings command
+	case COMMAND_GAME_MODE:
+		if (strcmp(c.arg, "1") == 0)
+			return "1-player";
+		else
+			return "2-player";
+
+	case COMMAND_DIFFICULTY:
+		return difficultyArgPrint(c.arg);
+	case COMMAND_USER_COLOR:
+		if (strcmp(c.arg, "0") == 0)
+			return "black";
+		else
+			return "white";
+	}
+	return NULL;
+}
+
+
+
+
+
+
+char* difficultyArgPrint(char* c)
+{
+	switch (c[0])
+	{
+	case '1':
+		return "amateur";
+		break;
+	case '2':
+		return "easy";
+		break;
+	case '3':
+		return "moderate";
+		break;
+	case '4':
+		return "hard";
+		break;
+	case '5':
+		return "expert";
+		break;
+	}
+	return NULL;
+}
+
+
+
+
+
 bool spParserIsInt(const char* str)
 {
 	for (unsigned int i = 0; i < strlen(str); i++)
@@ -57,6 +114,8 @@ bool spParserIsInt(const char* str)
 
 	return true;
 }
+
+
 
 ParsedCommand ParserPraseLine(const char* str)
 {
@@ -126,7 +185,7 @@ ParsedCommand ParserPraseLine(const char* str)
 	if (output.cmd == COMMAND_LOAD)//only checks that the path string is not NULL
 	{
 		word = strtok(NULL, " \t\r\n");
-		if (word != NULL )
+		if (word != NULL)
 		{
 			output.arg = word;
 			output.validArg = true;
@@ -155,7 +214,7 @@ ParsedCommand ParserPraseLine(const char* str)
 			{
 				if (i != 1)
 				{
-					if (isValidLocation(word)==false)
+					if (isValidLocation(word) == false)
 						output.validArg = false;
 					else
 					{
@@ -170,13 +229,13 @@ ParsedCommand ParserPraseLine(const char* str)
 		}
 
 
-	//if (strtok(NULL, " \t\r\n") != NULL) //in case there are unnecessary letters
-	//{
-	//	output.cmd = SP_INVALID_LINE;
-	//	output.validArg = false;
-	//}
+		//if (strtok(NULL, " \t\r\n") != NULL) //in case there are unnecessary letters
+		//{
+		//	output.cmd = SP_INVALID_LINE;
+		//	output.validArg = false;
+		//}
 
-	//return output;
+		//return output;
 	}
 	if (output.cmd == COMMAND_GET_MOVES)
 	{
@@ -186,7 +245,7 @@ ParsedCommand ParserPraseLine(const char* str)
 		if (isValidLocation(word) == false)
 			output.validArg = false;
 	}
-	
+
 	return output;
 }
 
