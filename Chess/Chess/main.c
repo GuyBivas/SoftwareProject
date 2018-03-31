@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "ChessGame.h"
+#include "ChessGameManager.h"
 #include "MainAux.h"
 
 #define HISTORY_SIZE 6
@@ -15,7 +15,7 @@ int main()
 
 	while (game == NULL)
 	{
-		game = newGameManager(HISTORY_SIZE);
+		game = createGameManager(HISTORY_SIZE);
 		if (game == NULL)
 			exitGame(game, true);
 	}

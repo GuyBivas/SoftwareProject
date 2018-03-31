@@ -3,13 +3,6 @@
 #include <ctype.h>
 #include "MainAux.h"
 
-
-
-
-
-
-
-
 ParsedCommand getCommand()
 {
 	ParsedCommand cmd;
@@ -21,23 +14,23 @@ ParsedCommand getCommand()
 }
 
 
-void commandExecution(ChessGameManager* game, ParsedCommand command)
+void commandExecution(ChessGameManager* manager, ParsedCommand command)
 {
 	switch (command.cmd)
 	{
 	case COMMAND_GAME_MODE:
-		ExecutionCommandGameMode(game, command);
+		ExecutionCommandGameMode(manager, command);
 
 	case COMMAND_DIFFICULTY:
-		ExecutionCommandDifficulty(game, command);
+		ExecutionCommandDifficulty(manager, command);
 	case COMMAND_USER_COLOR:
-		ExecutionCommandUserColor(game, command);
+		ExecutionCommandUserColor(manager, command);
 	case COMMAND_LOAD:// continue tommorow from here
 		return; // "load";
 	case COMMAND_DEFAULT:
-		game->mode = ONE_PLAYER;
-		game->difficulty = EASY;
-		game->game->currentPlayer = WHITE;
+		manager->mode = ONE_PLAYER;
+		manager->difficulty = EASY;
+		manager->game->currentPlayer = WHITE;
 	case COMMAND_QUIT:
 		return; // "quit";
 	case COMMAND_START:
@@ -46,14 +39,14 @@ void commandExecution(ChessGameManager* game, ParsedCommand command)
 }
 
 
-void ExecutionCommandGameMode(ChessGameManager* game, ParsedCommand command)
+void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command)
 {
 	if (command.validArg == true)
 	{
 		if (strcmp(command.arg, "1") == 0)
-			game->mode = ONE_PLAYER;
+			manager->mode = ONE_PLAYER;
 		else
-			game->mode = TWO_PLAYERS;
+			manager->mode = TWO_PLAYERS;
 		printf("Game mode is set to %s\n", enumArgToString(command));
 	}
 	else
@@ -77,9 +70,9 @@ void ExecutionCommandDifficulty(ChessGameManager* game, ParsedCommand command)
 }
 
 
-void ExecutionCommandUserColor(ChessGameManager* game, ParsedCommand command)
+void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 {
-	if (game->mode == ONE_PLAYER)
+	if (manager->mode == ONE_PLAYER)
 	{
 		if (command.validArg == true)
 			printf("User color is set to %s\n", enumArgToString(command));
@@ -93,9 +86,9 @@ void ExecutionCommandUserColor(ChessGameManager* game, ParsedCommand command)
 }
 
 
-void exitGame(ChessGameManager* game, bool isMallocError)
+void exitGame(ChessGameManager* manager, bool isMallocError)
 {
-	gameDestroy(game);
+	gameDestroy(manager);
 
 	if (!isMallocError)
 		printf("Exiting...\n");
@@ -104,28 +97,28 @@ void exitGame(ChessGameManager* game, bool isMallocError)
 }
 
 
-GAME_STATUS printWinner(ChessGameManager* src)
+GAME_STATUS printWinner(ChessGameManager* manager)
 {
-	if (src->game->status == STATUS_MATE && src->game->currentPlayer == WHITE)
+	if (manager->game->status == STATUS_MATE && manager->game->currentPlayer == WHITE)
 		printf("Checkmate! white player wins the game\n");
 
-	if (src->game->status == STATUS_MATE && src->game->currentPlayer == WHITE)
+	if (manager->game->status == STATUS_MATE && manager->game->currentPlayer == WHITE)
 		printf("Checkmate! black player wins the game\n");
 
-	if (src->game->status == STATUS_DRAW)
+	if (manager->game->status == STATUS_DRAW)
 		printf("The game ends in a draw\n");
 
 	return 0;
 }
 
 
-int makeUserTurn(ChessGameManager* game)
+int makeUserTurn(ChessGameManager* manager)
 {
 	return 0;
 }
 
 
-void makeComputerTurn(ChessGameManager* game)
+void makeComputerTurn(ChessGameManager* manager)
 {
 
 }

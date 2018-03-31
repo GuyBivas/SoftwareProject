@@ -7,19 +7,19 @@
 #include <stdlib.h>
 #include "Parser.h"
 #include "Enums.h"
-#include "ChessGame.h"
+#include "ChessGameManager.h"
 
 
 ParsedCommand getCommand();
 
-void commandExecution(ChessGameManager* game, ParsedCommand command);
-void exitGame(ChessGameManager* game, bool isMallocError);
-GAME_STATUS printWinner(ChessGameManager* src);
-int makeUserTurn(ChessGameManager* game);
-void makeComputerTurn(ChessGameManager* game);
+void commandExecution(ChessGameManager* manager, ParsedCommand command);
+void exitGame(ChessGameManager* manager, bool isMallocError);
+GAME_STATUS printWinner(ChessGameManager* manager);
+int makeUserTurn(ChessGameManager* manager);
+void makeComputerTurn(ChessGameManager* manager);
 
-void ExecutionCommandGameMode(ChessGameManager* game, ParsedCommand command);
-void ExecutionCommandDifficulty(ChessGameManager* game, ParsedCommand command);
-void ExecutionCommandUserColor(ChessGameManager* game, ParsedCommand command);
+void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command);
+void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command);
+void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command);
 
 #endif

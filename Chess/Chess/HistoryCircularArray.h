@@ -2,7 +2,7 @@
 #define HISTORYCIRCULARARRAY_H
 
 #include <stdbool.h>
-#include "ChessStructs.h"
+#include "ChessGame.h"
 #include "Enums.h"
 
 typedef struct history_circular_array {

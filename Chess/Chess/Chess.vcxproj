@@ -119,10 +119,10 @@
     <ClCompile Include="ChessGame.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Parser.c" />
-    <ClCompile Include="ChessStructs.c" />
+    <ClCompile Include="ChessGameManager.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ChessStructs.h" />
+    <ClInclude Include="ChessGameManager.h" />
     <ClInclude Include="HistoryCircularArray.h" />
     <ClInclude Include="MainAux.h" />
     <ClInclude Include="MoveOptionsList.h" />

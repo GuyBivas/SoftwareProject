@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 #include "Enums.h"
-#include "ChessStructs.h"
+#include "ChessGame.h"
 
 /**
  * ArrayList summary:

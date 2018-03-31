@@ -18,9 +18,6 @@
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChessGame.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MoveOptionsList.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,7 +30,10 @@
     <ClCompile Include="MainAux.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ChessStructs.c">
+    <ClCompile Include="ChessGameManager.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChessGame.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -56,7 +56,7 @@
     <ClInclude Include="MainAux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ChessStructs.h">
+    <ClInclude Include="ChessGameManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
