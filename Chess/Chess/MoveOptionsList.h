@@ -2,8 +2,8 @@
 #define MOVEOPTIONSLIST_H
 
 #include <stdbool.h>
+#include "Position.h"
 #include "Enums.h"
-#include "ChessGame.h"
 
 /**
  * ArrayList summary:

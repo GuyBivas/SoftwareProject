@@ -115,20 +115,24 @@
   <ItemGroup>
     <ClCompile Include="HistoryCircularArray.c" />
     <ClCompile Include="MainAux.c" />
+    <ClCompile Include="Minimax.c" />
     <ClCompile Include="MoveOptionsList.c" />
     <ClCompile Include="ChessGame.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="Parser.c" />
     <ClCompile Include="ChessGameManager.c" />
+    <ClCompile Include="Position.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChessGameManager.h" />
     <ClInclude Include="HistoryCircularArray.h" />
     <ClInclude Include="MainAux.h" />
+    <ClInclude Include="Minimax.h" />
     <ClInclude Include="MoveOptionsList.h" />
     <ClInclude Include="ChessGame.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Parser.h" />
+    <ClInclude Include="Position.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -36,6 +36,12 @@
     <ClCompile Include="ChessGame.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Minimax.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Position.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChessGame.h">
@@ -57,6 +63,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ChessGameManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Minimax.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Position.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

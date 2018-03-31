@@ -88,7 +88,7 @@ void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 
 void exitGame(ChessGameManager* manager, bool isMallocError)
 {
-	gameDestroy(manager);
+	gameManagerDestroy(manager);
 
 	if (!isMallocError)
 		printf("Exiting...\n");

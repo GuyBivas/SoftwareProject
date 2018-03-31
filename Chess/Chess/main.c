@@ -15,7 +15,7 @@ int main()
 
 	while (game == NULL)
 	{
-		game = createGameManager(HISTORY_SIZE);
+		game = gameManagerCreate(HISTORY_SIZE);
 		if (game == NULL)
 			exitGame(game, true);
 	}
@@ -36,7 +36,7 @@ int main()
 	//{
 	//	if (game->status != STATUS_NORMAL)//MATE or DRAW
 	//	{
-	//		gamePrintBoard(game);
+	//		gameManagerPrintBoard(game);
 	//		printWinner(game);
 	//		exitGame(game, false);
 	//	}
