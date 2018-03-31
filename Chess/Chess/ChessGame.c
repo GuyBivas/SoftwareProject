@@ -7,20 +7,20 @@
 
 #pragma region Game Functions
 
-ChessGame* gameCreate(int historySize)
+ChessGameManager* newGameManager(int historySize)
 {
 	if (historySize <= 0) //TODO: check if needed
 		return NULL;
 
-	ChessGame* game = (ChessGame*)malloc(sizeof(ChessGame));
+	ChessGameManager* game = (ChessGameManager*)malloc(sizeof(ChessGameManager));
 
 	if (game == NULL)
 		return NULL;
 
-	game->status = STATUS_NORMAL;
+	game->game->status = STATUS_NORMAL;
+	game->game->currentPlayer = WHITE;
 	game->mode = ONE_PLAYER;
 	game->difficulty = EASY;
-	game->currentPlayer = WHITE;
 	game->history = circularArrayCreate(historySize);
 
 	if (game->history == NULL)
@@ -33,7 +33,7 @@ ChessGame* gameCreate(int historySize)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			game->gameBoard[i][j] = NULL;
+			game->game->gameBoard[i][j] = NULL;
 			if (j <= 1 || j >= 6)
 			{
 				Position pos = newPos(i, j);
@@ -68,9 +68,9 @@ ChessGame* gameCreate(int historySize)
 						piece->type = KING;
 
 						if (piece->color == WHITE)
-							game->whiteKing = piece;
+							game->game->whiteKing = piece;
 						else
-							game->blackKing = piece;
+							game->game->blackKing = piece;
 					}
 				}
 			}
@@ -80,31 +80,31 @@ ChessGame* gameCreate(int historySize)
 	return game;
 }
 
-ChessGame* gameCopy(ChessGame* src)
+ChessGameManager* gameCopy(ChessGameManager* src)
 {
-	ChessGame* copy = (ChessGame*)malloc(sizeof(ChessGame));
+	ChessGameManager* copy = (ChessGameManager*)malloc(sizeof(ChessGameManager));
 
 	if (copy == NULL)
 		return NULL;
 
-	copy->currentPlayer = src->currentPlayer;
+	copy->game->currentPlayer = src->game->currentPlayer;
 	copy->history = NULL; // copy is only for minimax - dont need to copy history
-	copy->status = src->status;
-	copy->whiteKing = src->whiteKing;
-	copy->blackKing = src->blackKing;
+	copy->game->status = src->game->status;
+	copy->game->whiteKing = src->game->whiteKing;
+	copy->game->blackKing = src->game->blackKing;
 
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			copy->gameBoard[i][j] = src->gameBoard[i][j];
+			copy->game->gameBoard[i][j] = src->game->gameBoard[i][j];
 		}
 	}
 
 	return copy;
 }
 
-void gameDestroy(ChessGame* src)
+void gameDestroy(ChessGameManager* src)
 {
 	if (src == NULL)
 		return;
@@ -115,14 +115,14 @@ void gameDestroy(ChessGame* src)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			free(src->gameBoard[i][j]);
+			free(src->game->gameBoard[i][j]);
 		}
 	}
 
 	free(src);
 }
 
-MoveOptionsList* gameGetValidMoves(ChessGame* src, Position pos)
+MoveOptionsList* gameGetValidMoves(ChessGameManager* src, Position pos)
 {
 	MoveOptionsList* validMoves = arrayListCreate(8 * 4 - 3); // 8*4-3 is the maximum possible moves for a queen
 	ChessPiece* piece = gameGetPieceAt(src, pos);
@@ -150,38 +150,38 @@ MoveOptionsList* gameGetValidMoves(ChessGame* src, Position pos)
 	return validMoves;
 }
 
-bool gameMakeMove(ChessGame* src, Move move)
+bool gameMakeMove(ChessGameManager* src, Move move)
 {
 	if (logicIsValidMove(src, move) == false)
 		return false;
 
-	circularArrayAdd(src->history, gameCopy(src));
+	circularArrayAdd(src->history, gameCopy(src)->game);
 
 	gameMovePiece(src, move);
 	logicUpdateGameStatus(src);
 
-	if (src->status == STATUS_NORMAL)
-		src->currentPlayer = (src->currentPlayer == WHITE) ? BLACK : WHITE;
+	if (src->game->status == STATUS_NORMAL)
+		src->game->currentPlayer = (src->game->currentPlayer == WHITE) ? BLACK : WHITE;
 
 	return true;
 }
 
-CHESS_GAME_MESSAGE gameUndoPrevMove(ChessGame* src)
+CHESS_GAME_MESSAGE gameUndoPrevMove(ChessGameManager* src)
 {
-	ChessGame* copy = gameCopy(circularArrayGetCurrent(src->history)); // to fix incomplete type
+	ChessGame* copy = circularArrayGetCurrent(src->history);
 	if (src->history->actualSize == 0)
 		return CHESS_GAME_NO_HISTORY;
 
-	src->currentPlayer = copy->currentPlayer;
-	src->whiteKing = copy->whiteKing;
-	src->blackKing = copy->blackKing;
-	src->status = copy->status;
+	src->game->currentPlayer = copy->currentPlayer;
+	src->game->whiteKing = copy->whiteKing;
+	src->game->blackKing = copy->blackKing;
+	src->game->status = copy->status;
 
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			src->gameBoard[i][j] = copy->gameBoard[i][j];
+			src->game->gameBoard[i][j] = copy->gameBoard[i][j];
 		}
 	}
 
@@ -228,14 +228,14 @@ void printPiece(ChessPiece* piece)
 	printf("%c ", c);
 }
 
-CHESS_GAME_MESSAGE gamePrintBoard(ChessGame* src)
+CHESS_GAME_MESSAGE gamePrintBoard(ChessGameManager* src)
 {
 	if (src == NULL)
 		return CHESS_GAME_INVALID_ARGUMENT;
 
-	for (int j = 7; j >=0; j--)
+	for (int j = 7; j >= 0; j--)
 	{
-		printf("%d| ", j+1);
+		printf("%d| ", j + 1);
 		for (int i = 0; i < 8; i++)
 		{
 			printPiece(gameGetPieceAt(src, newPos(i, j)));
@@ -250,23 +250,23 @@ CHESS_GAME_MESSAGE gamePrintBoard(ChessGame* src)
 	return CHESS_GAME_SUCCESS;
 }
 
-ChessPiece* gameGetPieceAt(ChessGame* src, Position pos)
+ChessPiece* gameGetPieceAt(ChessGameManager* src, Position pos)
 {
-	if (gameIsInBoard(pos) == false)
+	if (posIsInBoard(pos) == false)
 		return NULL;
 
-	return src->gameBoard[pos.x][pos.y];
+	return src->game->gameBoard[pos.x][pos.y];
 }
 
-void gameSetPieceAt(ChessGame* src, Position pos, ChessPiece* newPiece)
+void gameSetPieceAt(ChessGameManager* src, Position pos, ChessPiece* newPiece)
 {
-	if (gameIsInBoard(pos) == false)
+	if (posIsInBoard(pos) == false)
 		return;
 
-	src->gameBoard[pos.x][pos.y] = newPiece;
+	src->game->gameBoard[pos.x][pos.y] = newPiece;
 }
 
-void gameMovePiece(ChessGame* src, Move move)
+void gameMovePiece(ChessGameManager* src, Move move)
 {
 	ChessPiece* fromPiece = gameGetPieceAt(src, move.from);
 	ChessPiece* toPiece = gameGetPieceAt(src, move.to);
@@ -283,40 +283,68 @@ void gameMovePiece(ChessGame* src, Move move)
 
 #pragma region Piece Valid Functions (not in header)
 
-bool isValidMovePawn(ChessGame* src, Move move)
+bool checkClearPath(ChessGameManager* src, Move move)
+{
+	Position step = posNormilized(posDiff(move.from, move.to));
+
+	// check that there is no piece between move.from and move.to
+	// start at move.from, go one step at a time until move.to
+	for (Position p = posAdd(move.from, step); posEqual(p, move.to) == false; p = posAdd(p, step))
+	{
+		if (gameGetPieceAt(src, p) != NULL)
+			return false;
+	}
+
+	return true;
+}
+
+bool isValidMovePawn(ChessGameManager* src, Move move)
 {
 	return true;
 }
 
-bool isValidMoveKnight(ChessGame* src, Move move)
+bool isValidMoveKnight(ChessGameManager* src, Move move)
 {
-	return true;
+	Position absDiff = posAbs(posDiff(move.from, move.to));
+
+	return (absDiff.x == 2 && absDiff.y == 1) ||
+		(absDiff.x == 1 && absDiff.y == 2);
 }
 
-bool isValidMoveBishop(ChessGame* src, Move move)
+bool isValidMoveBishop(ChessGameManager* src, Move move)
 {
-	return true;
+	Position diffAbs = posAbs(posDiff(move.from, move.to));
+
+	// check if moving in a valid diagonal
+	if (diffAbs.x != diffAbs.y)
+		return false;
+
+	return checkClearPath(src, move);
 }
 
-bool isValidMoveRook(ChessGame* src, Move move)
+bool isValidMoveRook(ChessGameManager* src, Move move)
 {
-	return true;
+	Position diff = posDiff(move.from, move.to);
+
+	// check if moving in only one axis (the case both are zero is detected before)
+	if (diff.x != 0 && diff.y != 0)
+		return false;
+
+	return checkClearPath(src, move);
 }
 
-bool isValidMoveQueen(ChessGame* src, Move move)
+bool isValidMoveQueen(ChessGameManager* src, Move move)
 {
 	return isValidMoveBishop(src, move) || isValidMoveRook(src, move);
 }
 
-bool isValidMoveKing(ChessGame* src, Move move)
+bool isValidMoveKing(ChessGameManager* src, Move move)
 {
-	int diffX = abs(move.from.x - move.to.x);
-	int diffY = abs(move.from.y - move.to.y);
-
-	return diffX <= 1 && diffY <= 1;
+	Position absDiff = posAbs(posDiff(move.from, move.to));
+	return absDiff.x <= 1 && absDiff.x <= 1;
 }
 
-typedef bool(*ValidFuncPtr)(ChessGame*, Move);
+typedef bool(*ValidFuncPtr)(ChessGameManager*, Move);
 ValidFuncPtr getValidFuncPtr(PIECE_TYPE type)
 {
 	switch (type)
@@ -334,15 +362,17 @@ ValidFuncPtr getValidFuncPtr(PIECE_TYPE type)
 	case KING:
 		return isValidMoveKing;
 	}
+
+	return NULL;
 }
 
 #pragma endregion
 
 #pragma region Logic
 
-bool logicCheckThreatened(ChessGame* src, Position pos, PLAYER_COLOR currColor)
+bool logicCheckThreatened(ChessGameManager* src, Position pos, PLAYER_COLOR currColor)
 {
-	ChessGame* copy = gameCopy(src); // copy game to overide piece at pos, without changing the game
+	ChessGameManager* copy = gameCopy(src); // copy game to overide piece at pos, without changing the game
 	ChessPiece dummyPieace;
 	dummyPieace.color = currColor;
 
@@ -369,16 +399,16 @@ bool logicCheckThreatened(ChessGame* src, Position pos, PLAYER_COLOR currColor)
 	return false;
 }
 
-void logicUpdateGameStatus(ChessGame* src)
+void logicUpdateGameStatus(ChessGameManager* src)
 {
 }
 
-IS_VALID_MOVE_RESULT logicIsValidMove(ChessGame* src, Move move)
+IS_VALID_MOVE_RESULT logicIsValidMove(ChessGameManager* src, Move move)
 {
 	ChessPiece* fromPiece = gameGetPieceAt(src, move.from);
 	ChessPiece* toPiece = gameGetPieceAt(src, move.to);
 
-	if (gameIsInBoard(move.from) == false || gameIsInBoard(move.to) == false)
+	if (posIsInBoard(move.from) == false || posIsInBoard(move.to) == false)
 		return IVMR_INVALID_POSITION;
 
 	if (fromPiece == NULL)
@@ -393,44 +423,12 @@ IS_VALID_MOVE_RESULT logicIsValidMove(ChessGame* src, Move move)
 	if (getValidFuncPtr(fromPiece->type)(src, move) == false)
 		return IVMR_ILLEGAL_MOVE;
 
-	ChessPiece* king = ((src->currentPlayer == WHITE) ? src->whiteKing : src->blackKing);
-	logicCheckThreatened(src, king->position, src->currentPlayer);
+	ChessPiece* king = ((src->game->currentPlayer == WHITE) ? src->game->whiteKing : src->game->blackKing);
+	logicCheckThreatened(src, king->position, src->game->currentPlayer);
 	//return IVMR_KING_STILL_THREATENED;
 	//return IVMR_KING_GET_THREATENED;
 
 	return IVMR_VALID;
-}
-
-#pragma endregion
-
-#pragma region Basic Functions
-
-Position newPos(int x, int y)
-{
-	Position pos;
-	pos.x = x;
-	pos.y = y;
-
-	return pos;
-}
-
-Move newMove(Position from, Position to)
-{
-	Move move;
-	move.from = from;
-	move.to = to;
-
-	return move;
-}
-
-bool posEqual(Position pos1, Position pos2)
-{
-	return pos1.x == pos2.x && pos1.y == pos2.y;
-}
-
-bool gameIsInBoard(Position pos)
-{
-	return !(pos.x >= 8 || pos.y >= 8 || pos.x < 0 || pos.y < 0);
 }
 
 #pragma endregion

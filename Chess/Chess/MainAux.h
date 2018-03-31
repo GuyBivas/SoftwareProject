@@ -12,14 +12,14 @@
 
 ParsedCommand getCommand();
 
-void commandExecution(ChessGame* game, ParsedCommand command);
-void exitGame(ChessGame* game, bool isMallocError);
-GAME_STATUS printWinner(ChessGame* src);
-int makeUserTurn(ChessGame* game);
-void makeComputerTurn(ChessGame* game);
+void commandExecution(ChessGameManager* game, ParsedCommand command);
+void exitGame(ChessGameManager* game, bool isMallocError);
+GAME_STATUS printWinner(ChessGameManager* src);
+int makeUserTurn(ChessGameManager* game);
+void makeComputerTurn(ChessGameManager* game);
 
-void ExecutionCommandGameMode(ChessGame* game, ParsedCommand command);
-void ExecutionCommandDifficulty(ChessGame* game, ParsedCommand command);
-void ExecutionCommandUserColor(ChessGame* game, ParsedCommand command);
+void ExecutionCommandGameMode(ChessGameManager* game, ParsedCommand command);
+void ExecutionCommandDifficulty(ChessGameManager* game, ParsedCommand command);
+void ExecutionCommandUserColor(ChessGameManager* game, ParsedCommand command);
 
 #endif

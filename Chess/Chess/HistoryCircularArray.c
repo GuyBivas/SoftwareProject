@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "HistoryCircularArray.h"
 
-typedef struct ChessGame ChessGame;
-
 HistoryCircularArray* circularArrayCreate(int maxSize)
 {
 	HistoryCircularArray* newList = (HistoryCircularArray*)malloc(sizeof(HistoryCircularArray));

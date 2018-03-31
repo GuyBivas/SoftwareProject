@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "MoveOptionsList.h"
 
-//typedef struct moveOption moveOption;
-
 MoveOptionsList* arrayListCreate(int maxSize)
 {
 	MoveOptionsList* newList = (MoveOptionsList*)malloc(sizeof(MoveOptionsList));

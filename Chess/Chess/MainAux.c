@@ -21,7 +21,7 @@ ParsedCommand getCommand()
 }
 
 
-void commandExecution(ChessGame* game, ParsedCommand command)
+void commandExecution(ChessGameManager* game, ParsedCommand command)
 {
 	switch (command.cmd)
 	{
@@ -33,20 +33,20 @@ void commandExecution(ChessGame* game, ParsedCommand command)
 	case COMMAND_USER_COLOR:
 		ExecutionCommandUserColor(game, command);
 	case COMMAND_LOAD:// continue tommorow from here
-		return "load";
+		return; // "load";
 	case COMMAND_DEFAULT:
 		game->mode = ONE_PLAYER;
 		game->difficulty = EASY;
-		game->currentPlayer = WHITE;
+		game->game->currentPlayer = WHITE;
 	case COMMAND_QUIT:
-		return "quit";
+		return; // "quit";
 	case COMMAND_START:
-		return "start";
+		return; // "start";
 	}
 }
 
 
-void ExecutionCommandGameMode(ChessGame* game, ParsedCommand command)
+void ExecutionCommandGameMode(ChessGameManager* game, ParsedCommand command)
 {
 	if (command.validArg == true)
 	{
@@ -63,7 +63,7 @@ void ExecutionCommandGameMode(ChessGame* game, ParsedCommand command)
 }
 
 
-void ExecutionCommandDifficulty(ChessGame* game, ParsedCommand command)
+void ExecutionCommandDifficulty(ChessGameManager* game, ParsedCommand command)
 {
 	if (command.validArg == true)
 	{
@@ -77,7 +77,7 @@ void ExecutionCommandDifficulty(ChessGame* game, ParsedCommand command)
 }
 
 
-void ExecutionCommandUserColor(ChessGame* game, ParsedCommand command)
+void ExecutionCommandUserColor(ChessGameManager* game, ParsedCommand command)
 {
 	if (game->mode == ONE_PLAYER)
 	{
@@ -93,7 +93,7 @@ void ExecutionCommandUserColor(ChessGame* game, ParsedCommand command)
 }
 
 
-void exitGame(ChessGame* game, bool isMallocError)
+void exitGame(ChessGameManager* game, bool isMallocError)
 {
 	gameDestroy(game);
 
@@ -104,25 +104,28 @@ void exitGame(ChessGame* game, bool isMallocError)
 }
 
 
-GAME_STATUS printWinner(ChessGame* src)
+GAME_STATUS printWinner(ChessGameManager* src)
 {
-	if (src->status == STATUS_MATE && src->currentPlayer == WHITE)
+	if (src->game->status == STATUS_MATE && src->game->currentPlayer == WHITE)
 		printf("Checkmate! white player wins the game\n");
 
-	if (src->status == STATUS_MATE && src->currentPlayer == WHITE)
+	if (src->game->status == STATUS_MATE && src->game->currentPlayer == WHITE)
 		printf("Checkmate! black player wins the game\n");
 
-	if (src->status == STATUS_DRAW)
+	if (src->game->status == STATUS_DRAW)
 		printf("The game ends in a draw\n");
+
+	return 0;
 }
 
 
-int makeUserTurn(ChessGame* game)
+int makeUserTurn(ChessGameManager* game)
 {
+	return 0;
 }
 
 
-void makeComputerTurn(ChessGame* game)
+void makeComputerTurn(ChessGameManager* game)
 {
 
 }

@@ -2,15 +2,11 @@
 #include "ChessGame.h"
 #include "MainAux.h"
 
-
-
-
 #define HISTORY_SIZE 6
-
 
 int main()
 {
-	ChessGame* game = NULL;
+	ChessGameManager* game = NULL;
 	ParsedCommand command;
 	PLAYER_COLOR playerColor;
 
@@ -19,7 +15,7 @@ int main()
 
 	while (game == NULL)
 	{
-		game = gameCreate(HISTORY_SIZE);
+		game = newGameManager(HISTORY_SIZE);
 		if (game == NULL)
 			exitGame(game, true);
 	}

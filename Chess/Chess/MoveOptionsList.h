@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "Enums.h"
+#include "ChessStructs.h"
 
 /**
  * ArrayList summary:
@@ -39,7 +40,11 @@
  * ArrayListIsEmpty      - Returns true if the array list contains no elements.
  */
 
-typedef struct moveOption moveOption;
+typedef struct moveOption {
+	Position pos;
+	bool isThreatened;
+	bool isCapturing;
+} moveOption;
 
 typedef struct move_options_list {
 	moveOption** elements;
