@@ -24,35 +24,41 @@ bool posEqual(Position pos1, Position pos2)
 	return pos1.x == pos2.x && pos1.y == pos2.y;
 }
 
-Position posAdd(Position pos1, Position pos2)
+bool posIsInBoard(Position pos)
 {
-	return newPos(pos1.x + pos2.x, pos1.y + pos2.y);
+	return (pos.x < 8 || pos.y < 8 || pos.x >= 0 || pos.y >= 0);
 }
 
-Position posDiff(Position pos1, Position pos2)
+Vector2 vecAdd(Vector2 vec1, Vector2 vec2)
 {
-	int diffX = pos1.x - pos2.x;
-	int diffY = pos1.y - pos2.y;
+	return newPos(vec1.x + vec2.x, vec1.y + vec2.y);
+}
+
+Vector2 vecDiff(Vector2 vec1, Vector2 vec2)
+{
+	int diffX = vec1.x - vec2.x;
+	int diffY = vec1.y - vec2.y;
 
 	return newPos(diffX, diffY);
 }
 
-Position posAbs(Position pos)
+Vector2 vecAbs(Vector2 vec)
 {
-	return newPos(abs(pos.x), abs(pos.y));
+	return newPos(abs(vec.x), abs(vec.y));
 }
 
-Position posNormilized(Position pos)
+Vector2 vecNormilized(Vector2 vec)
 {
-	Position abs = posAbs(pos);
+	Position abs = vecAbs(vec);
 
-	int normX = (pos.x == 0 ? 0 : pos.x / abs.x);
-	int normY = (pos.y == 0 ? 0 : pos.y / abs.y);
+	int normX = (vec.x == 0 ? 0 : vec.x / abs.x);
+	int normY = (vec.y == 0 ? 0 : vec.y / abs.y);
 
 	return newPos(normX, normY);
 }
 
-bool posIsInBoard(Position pos)
+int vecMagnitude(Vector2 vec)
 {
-	return (pos.x < 8 || pos.y < 8 || pos.x >= 0 || pos.y >= 0);
+	Position abs = vecAbs(vec);
+	return abs.x + abs.y;
 }

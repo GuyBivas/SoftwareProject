@@ -109,8 +109,8 @@ bool gameManagerMakeMove(ChessGameManager* src, Move move)
 	gameMovePiece(src->game, move);
 	logicUpdateGameStatus(src->game);
 
-	if (src->game->status == STATUS_NORMAL)
-		src->game->currentPlayer = (src->game->currentPlayer == WHITE) ? BLACK : WHITE;
+	if (src->game->status == STATUS_NORMAL || src->game->status == STATUS_CHECK)
+		src->game->currentPlayer = getOpositeColor(src->game->currentPlayer);
 
 	return true;
 }

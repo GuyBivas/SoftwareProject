@@ -82,17 +82,22 @@ MoveOptionsList* gameGetValidMoves(ChessGame* game, Position pos)
 	return validMoves;
 }
 
+PLAYER_COLOR getOpositeColor(PLAYER_COLOR color)
+{
+	return (color == WHITE ? BLACK : WHITE);
+}
+
 #pragma endregion
 
 #pragma region Piece Valid Functions (not in header)
 
 bool checkClearPath(ChessGame* game, Move move)
 {
-	Position step = posNormilized(posDiff(move.from, move.to));
+	Vector2 step = vecNormilized(vecDiff(move.from, move.to));
 
 	// check that there is no piece between move.from and move.to
 	// start at move.from, go one step at a time until move.to
-	for (Position p = posAdd(move.from, step); posEqual(p, move.to) == false; p = posAdd(p, step))
+	for (Position p = vecAdd(move.from, step); posEqual(p, move.to) == false; p = vecAdd(p, step))
 	{
 		if (gameGetPieceAt(game, p) != NULL)
 			return false;
@@ -103,12 +108,57 @@ bool checkClearPath(ChessGame* game, Move move)
 
 bool isValidMovePawn(ChessGame* game, Move move)
 {
+	ChessPiece* pawn = gameGetPieceAt(game, move.from);
+	ChessPiece* toPiece = gameGetPieceAt(game, move.to);
+
+	Vector2 diff = vecDiff(move.from, move.to);
+	Vector2 absDiff = vecAbs(diff);
+	Vector2 normDiff = vecNormilized(diff);
+
+	// check if moving the right direction
+	int colorDirection = (pawn->color == WHITE ? 1 : -1);
+	if (normDiff.x != colorDirection)
+		return false;
+
+	if (toPiece == NULL) // normal move
+	{
+		if (diff.y != 0)
+			return false;
+
+		if (absDiff.x == 1)
+		{
+			return true;
+		}
+		else if (absDiff.x == 2) // if jumping
+		{
+			bool isJumpValid = ((pawn->color == WHITE) ? (move.from.x == 1) : (move.from.x == 6));
+			if (isJumpValid == false)
+				return false;
+
+			// check that there is no piece in the middle of the jump
+			if (gameGetPieceAt(game, vecAdd(move.from, normDiff)) != NULL)
+				return false;
+		}
+		else if (absDiff.x > 2)
+		{
+			return false;
+		}
+	}
+	else if (toPiece != NULL) // capturing move
+	{
+		if (toPiece->color == pawn->color)
+			return false;
+	
+		if (posEqual(absDiff, newPos(1, 1)) == false)
+			return false;
+	}
+
 	return true;
 }
 
 bool isValidMoveKnight(ChessGame* game, Move move)
 {
-	Position absDiff = posAbs(posDiff(move.from, move.to));
+	Vector2 absDiff = vecAbs(vecDiff(move.from, move.to));
 
 	return (absDiff.x == 2 && absDiff.y == 1) ||
 		(absDiff.x == 1 && absDiff.y == 2);
@@ -116,7 +166,7 @@ bool isValidMoveKnight(ChessGame* game, Move move)
 
 bool isValidMoveBishop(ChessGame* game, Move move)
 {
-	Position diffAbs = posAbs(posDiff(move.from, move.to));
+	Vector2 diffAbs = vecAbs(vecDiff(move.from, move.to));
 
 	// check if moving in a valid diagonal
 	if (diffAbs.x != diffAbs.y)
@@ -127,7 +177,7 @@ bool isValidMoveBishop(ChessGame* game, Move move)
 
 bool isValidMoveRook(ChessGame* game, Move move)
 {
-	Position diff = posDiff(move.from, move.to);
+	Vector2 diff = vecDiff(move.from, move.to);
 
 	// check if moving in only one axis (the case both are zero is detected before)
 	if (diff.x != 0 && diff.y != 0)
@@ -143,8 +193,8 @@ bool isValidMoveQueen(ChessGame* game, Move move)
 
 bool isValidMoveKing(ChessGame* game, Move move)
 {
-	Position absDiff = posAbs(posDiff(move.from, move.to));
-	return absDiff.x <= 1 && absDiff.x <= 1;
+	Vector2 absDiff = vecAbs(vecDiff(move.from, move.to));
+	return absDiff.x <= 1 && absDiff.y <= 1;
 }
 
 typedef bool(*ValidFuncPtr)(ChessGame*, Move);
@@ -175,7 +225,9 @@ ValidFuncPtr getValidFuncPtr(PIECE_TYPE type)
 
 bool logicCheckThreatened(ChessGame* game, Position pos, PLAYER_COLOR currColor)
 {
-	ChessGame* copy = gameCopy(game); // copy game to overide piece at pos, without changing the game
+	// copy game to overide piece at pos, without changing the game
+	// TODO: check if it damages running time significantly
+	ChessGame* copy = gameCopy(game);
 	ChessPiece dummyPieace;
 	dummyPieace.color = currColor;
 
@@ -191,7 +243,7 @@ bool logicCheckThreatened(ChessGame* game, Position pos, PLAYER_COLOR currColor)
 
 			if (gameGetPieceAt(copy, p) != NULL && gameGetPieceAt(copy, p)->color != currColor) // if there is an oponent's pieace at p 
 			{
-				if (logicIsValidMove(copy, newMove(p, pos)) == IVMR_VALID) // if the oponent's pieace can eat dummyPiece
+				if (logicIsValidMoveBasic(copy, newMove(p, pos)) == IVMR_VALID) // if the oponent's pieace can eat dummyPiece
 				{
 					return true;
 				}
@@ -202,11 +254,34 @@ bool logicCheckThreatened(ChessGame* game, Position pos, PLAYER_COLOR currColor)
 	return false;
 }
 
-void logicUpdateGameStatus(ChessGame* game)
+bool logicIsKingThreatened(ChessGame* game, PLAYER_COLOR color)
 {
+	ChessPiece* king = (color == WHITE ? game->whiteKing : game->blackKing);
+	return logicCheckThreatened(game, king->position, color);
 }
 
-IS_VALID_MOVE_RESULT logicIsValidMove(ChessGame* game, Move move)
+void logicUpdateGameStatus(ChessGame* game)
+{
+	bool isEnemyKingThreatened = logicIsKingThreatened(game, getOpositeColor(game->currentPlayer));
+
+	if (isEnemyKingThreatened)
+	{
+		/*bool isKingThreatenedAfter;
+		ChessGame* copy = gameCopy(game);
+		gameMovePiece(copy, move);
+		isKingThreatenedAfter = logicIsKingThreatened(copy, game->currentPlayer);
+		if (isKingThreatenedAfter)
+		{
+			bool isKingThreatenedBefore = logicIsKingThreatened(game, game->currentPlayer);
+			return (isKingThreatenedBefore ? IVMR_KING_STILL_THREATENED : IVMR_KING_GET_THREATENED);
+		}*/
+	}
+	else
+	{
+	}
+}
+
+IS_VALID_MOVE_RESULT logicIsValidMoveBasic(ChessGame* game, Move move)
 {
 	ChessPiece* fromPiece = gameGetPieceAt(game, move.from);
 	ChessPiece* toPiece = gameGetPieceAt(game, move.to);
@@ -214,7 +289,7 @@ IS_VALID_MOVE_RESULT logicIsValidMove(ChessGame* game, Move move)
 	if (posIsInBoard(move.from) == false || posIsInBoard(move.to) == false)
 		return IVMR_INVALID_POSITION;
 
-	if (fromPiece == NULL)
+	if (fromPiece == NULL || (fromPiece->color != game->currentPlayer))
 		return IVMR_NO_PIECE_IN_POS;
 
 	if (toPiece != NULL && fromPiece->color == toPiece->color)
@@ -226,10 +301,28 @@ IS_VALID_MOVE_RESULT logicIsValidMove(ChessGame* game, Move move)
 	if (getValidFuncPtr(fromPiece->type)(game, move) == false)
 		return IVMR_ILLEGAL_MOVE;
 
-	ChessPiece* king = ((game->currentPlayer == WHITE) ? game->whiteKing : game->blackKing);
-	logicCheckThreatened(game, king->position, game->currentPlayer);
-	//return IVMR_KING_STILL_THREATENED;
-	//return IVMR_KING_GET_THREATENED;
+	return IVMR_VALID;
+}
+
+IS_VALID_MOVE_RESULT logicIsValidMove(ChessGame* game, Move move)
+{
+	IS_VALID_MOVE_RESULT basicResult = logicIsValidMoveBasic(game, move);
+	if (basicResult != IVMR_VALID)
+	{
+		return basicResult;
+	}
+	else
+	{
+		bool isKingThreatenedAfter;
+		ChessGame* copy = gameCopy(game);
+		gameMovePiece(copy, move);
+		isKingThreatenedAfter = logicIsKingThreatened(copy, game->currentPlayer);
+		if (isKingThreatenedAfter)
+		{
+			bool isKingThreatenedBefore = logicIsKingThreatened(game, game->currentPlayer);
+			return (isKingThreatenedBefore ? IVMR_KING_STILL_THREATENED : IVMR_KING_GET_THREATENED);
+		}
+	}
 
 	return IVMR_VALID;
 }
