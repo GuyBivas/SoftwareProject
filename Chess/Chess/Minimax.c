@@ -33,24 +33,24 @@ int getPieceScore(ChessPiece* piece)
 	return piece->color == WHITE ? score : -score;
 }
 
-int getScore(ChessGame * game)
+int getGameScore(ChessGame* game)
 {
-	int result;
+	int score = 0;
 	
-	if (game->status == STATUS_MATE)
+	if (game->status == STATUS_DRAW)
 		return 0;
 
 	if (game->status == STATUS_MATE)
-		result = game->currentPlayer == WHITE ? MATE_SCORE : -MATE_SCORE;
+		score = game->currentPlayer == WHITE ? MATE_SCORE : -MATE_SCORE;
 
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
 			ChessPiece* piece = gameGetPieceAt(game, newPos(i, j));
-			result += getPieceScore(piece);
+			score += getPieceScore(piece);
 		}
 	}
 
-	return result;
+	return score;
 }

@@ -11,6 +11,6 @@
 #define QUEEN_SCORE 9
 #define KING_SCORE 100
 
-int getScore(ChessGame* game);
+int getGameScore(ChessGame* game);
 
 #endif
