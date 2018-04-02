@@ -115,28 +115,22 @@ bool gameManagerMakeMove(ChessGameManager* src, Move move)
 	return true;
 }
 
-CHESS_GAME_MESSAGE gameManagerUndoPrevMove(ChessGameManager* src)
+void gameManagerUndoPrevMove(ChessGameManager* src)
 {
-	ChessGame* copy = circularArrayGetCurrent(src->history);
-	if (src->history->actualSize == 0)
-		return CHESS_GAME_NO_HISTORY;
+	ChessGame* hist = circularArrayGetCurrent(src->history);
 
-	src->game->currentPlayer = copy->currentPlayer;
-	src->game->whiteKing = copy->whiteKing;
-	src->game->blackKing = copy->blackKing;
-	src->game->status = copy->status;
+	src->game->currentPlayer = hist->currentPlayer;
+	src->game->status = hist->status;
 
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			src->game->gameBoard[i][j] = copy->gameBoard[i][j];
+			src->game->gameBoard[i][j] = hist->gameBoard[i][j];
 		}
 	}
 
 	circularArrayRemove(src->history);
-
-	return CHESS_GAME_SUCCESS;
 }
 
 void printPiece(ChessPiece* piece)

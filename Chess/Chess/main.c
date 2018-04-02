@@ -9,6 +9,7 @@ int main()
 	ChessGameManager* game = NULL;
 	ParsedCommand command;
 	PLAYER_COLOR playerColor;
+	bool isSettingsState = true;
 
 
 	command.cmd = COMMAND_INVALID_LINE;//compiler wants initialization..
@@ -26,7 +27,7 @@ int main()
 
 
 		command = getCommand();
-		commandExecution(game, command);
+	//	commandExecution(game, command);
 		if (game->mode == ONE_PLAYER && command.cmd == COMMAND_USER_COLOR)
 			playerColor = atoi(command.arg);
 	}
@@ -37,7 +38,7 @@ int main()
 	//	if (game->status != STATUS_NORMAL)//MATE or DRAW
 	//	{
 	//		gameManagerPrintBoard(game);
-	//		printWinner(game);
+		printWinner(game);
 	//		exitGame(game, false);
 	//	}
 	//	else if (game->mode == ONE_PLAYER)

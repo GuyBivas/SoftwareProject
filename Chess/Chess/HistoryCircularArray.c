@@ -91,3 +91,16 @@ ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src)
 	free(src->elements[src->index]); // decreased index
 	return ARRAY_LIST_SUCCESS;
 }
+
+
+
+bool circularArrayListIsEmpty(HistoryCircularArray* src)
+{
+	return src->actualSize == 0;
+}
+
+
+int circularArrayListSize(HistoryCircularArray* src)
+{
+	return src->actualSize;
+}

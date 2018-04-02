@@ -14,8 +14,10 @@ ParsedCommand getCommand()
 }
 
 
-void commandExecution(ChessGameManager* manager, ParsedCommand command)
+void ExecutionSettingsState(ChessGameManager* manager)
 {
+	ParsedCommand command = getCommand();
+
 	switch (command.cmd)
 	{
 	case COMMAND_GAME_MODE:
@@ -25,7 +27,7 @@ void commandExecution(ChessGameManager* manager, ParsedCommand command)
 		ExecutionCommandDifficulty(manager, command);
 	case COMMAND_USER_COLOR:
 		ExecutionCommandUserColor(manager, command);
-	case COMMAND_LOAD:// continue tommorow from here
+	case COMMAND_LOAD://continue tommorow from here
 		return; // "load";
 	case COMMAND_DEFAULT:
 		manager->mode = ONE_PLAYER;
@@ -56,11 +58,11 @@ void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command)
 }
 
 
-void ExecutionCommandDifficulty(ChessGameManager* game, ParsedCommand command)
+void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command)
 {
 	if (command.validArg == true)
 	{
-		game->difficulty = atoi(command.arg) + 1;
+		manager->difficulty = atoi(command.arg) - 1;
 		printf("Difficulty level is set to %s\n", enumArgToString(command));
 	}
 	else
@@ -86,6 +88,161 @@ void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 }
 
 
+Move getLastMove(ChessGameManager* manager)
+{
+	ChessGame* beforeLastMove= circularArrayGetCurrent(manager->history);
+	PLAYER_COLOR currentPlayer = manager->game->currentPlayer;
+	Move lastMove;
+
+	if (manager->game->status == STATUS_NORMAL || manager->game->status == STATUS_CHECK)
+		currentPlayer = 1 - (manager->game->currentPlayer); // todo
+
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			Position pos = newPos(i, j);
+			ChessPiece* currentPiece = gameGetPieceAt(manager->game, pos);
+			ChessPiece* previousPiece = gameGetPieceAt(beforeLastMove, pos);
+
+			if (currentPiece->color != currentPlayer)
+				continue;
+
+			if (previousPiece != NULL && currentPiece == NULL)
+				lastMove.from =pos;
+
+			if (currentPiece != NULL && (previousPiece == NULL || currentPiece->color != previousPiece->color))
+				lastMove.to = pos;
+		}
+	}
+
+	return lastMove;
+}
+
+
+void printLastMove(ChessGameManager* manager, Move* lastMove)
+{
+	Position from = lastMove->from;
+	Position to = lastMove->to;
+	char color[6];
+	PLAYER_COLOR currentPlayer;
+
+	if (manager->game->status == STATUS_MATE || manager->game->status == STATUS_DRAW)
+		currentPlayer = manager->game->currentPlayer;
+	else
+		currentPlayer = 1 - (manager->game->currentPlayer);
+
+	if (currentPlayer == WHITE)
+		strcpy(color, "white");
+	else
+		strcpy(color, "black");
+
+	printf("Undo move for %s player: <%d,%d> -> <%d,%d>\n", color, from.x, from.y, to.x, to.y);
+}
+
+
+void ExecutionCommandUndo(ChessGameManager* manager)
+{
+	int k = 2;
+	Move lastMove;
+	PLAYER_COLOR currentPlayer;
+
+	if (circularArrayListIsEmpty(manager->history))
+	{
+		printf("Empty history, no move to undo\n");
+		return;
+	}
+	else if (circularArrayListSize(manager->history) == 1 || (manager->game->status==STATUS_MATE && manager->game->currentPlayer==WHITE && manager->mode==ONE_PLAYER ))//TODO change WHITE
+	{
+		k = 1;
+	}
+
+	for (int i = 0; i < k; i++)
+	{
+		lastMove = getLastMove(manager);
+		printLastMove(manager, &lastMove);
+		gameManagerUndoPrevMove(manager);
+		gameManagerPrintBoard(manager);
+	}
+}
+
+
+void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
+{
+
+	Position from = newPos(command.arg[0], command.arg[1]);
+	Position to = newPos(command.arg[2], command.arg[3]);
+	Move move = newMove(from, to);
+
+
+	switch (logicIsValidMove(manager->game, move))
+	{
+	case IVMR_INVALID_POSITION:
+		printf("Invalid position on the board\n");
+		return;
+	case IVMR_NO_PIECE_IN_POS:
+		printf("The specified position does not contain your piece\n");
+		return;
+	case IVMR_ILLEGAL_MOVE:
+		printf("Illegal move\n");
+		return;
+	case IVMR_KING_STILL_THREATENED:
+		printf("Illegal move: king is still threatened\n");
+		return;
+	case IVMR_KING_GET_THREATENED:
+		printf("Ilegal move: king will be threatened\n");
+		return;
+
+	case IVMR_VALID:
+		gameManagerMakeMove(manager, move);
+	}
+	
+	if (manager->game->status == STATUS_MATE || manager->game->status == STATUS_DRAW)
+	{
+		printWinner(manager);
+		exitGame(manager, true);
+	}
+
+
+
+}
+
+
+void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
+{
+	int x = atoi(command.arg[1]);
+	int y = atoi(command.arg[3]);
+	Position pos = newPos(x, y);
+
+	if (command.validArg == false)
+	{
+		printf("Invalid position on the board\n");
+		return;
+	}
+	if (gameGetPieceAt(manager->game, pos)==NULL)
+	{
+		printf("The specified position does not contain a player piece\n");
+		return;
+	}
+
+	MoveOptionsList* validMoves = gameGetValidMoves(manager, pos);
+
+	for (int i = 0; i < arrayListSize(validMoves); i++)
+	{
+		moveOption* moveOption = arrayListGetAt(validMoves, i);
+		printf("<%d,%d>", moveOption->pos.x, moveOption->pos.y);
+
+		if (moveOption->isThreatened)
+			printf("*");
+		
+		if (moveOption->isCapturing)
+			printf("^");
+		
+		printf("\n");
+	}
+}
+
+
 void exitGame(ChessGameManager* manager, bool isMallocError)
 {
 	gameManagerDestroy(manager);
@@ -96,31 +253,64 @@ void exitGame(ChessGameManager* manager, bool isMallocError)
 	exit(0);
 }
 
-
-GAME_STATUS printWinner(ChessGameManager* manager)
+char* getPlayerColorName(PLAYER_COLOR color)
 {
-	if (manager->game->status == STATUS_MATE && manager->game->currentPlayer == WHITE)
-		printf("Checkmate! white player wins the game\n");
+	return (color == WHITE ? "white" : "black");
+}
 
-	if (manager->game->status == STATUS_MATE && manager->game->currentPlayer == WHITE)
-		printf("Checkmate! black player wins the game\n");
+void printWinner(ChessGameManager* manager)
+{
+	if (manager->game->status == STATUS_MATE)
+		printf("Checkmate! %s player wins the game\n", getPlayerColorName(manager->game->currentPlayer));
 
 	if (manager->game->status == STATUS_DRAW)
 		printf("The game ends in a draw\n");
 
-	return 0;
+
 }
+
+
 
 
 int makeUserTurn(ChessGameManager* manager)
 {
-	return 0;
+	Move suggestedMove;
+	CHESS_GAME_MESSAGE gameMsg;
+	ParsedCommand curCommand = getCommand();
+
+	switch (curCommand.cmd)
+	{
+	case COMMAND_MOVE:
+		ExecutionCommandMove(manager, curCommand);
+		break;
+	case COMMAND_GET_MOVES:
+		ExecutionGetMoves(manager, curCommand);
+		break;
+	case COMMAND_SAVE://TODO
+		break;
+	case COMMAND_UNDO:
+		ExecutionCommandUndo(manager);
+		break;
+	case COMMAND_RESET://TODO
+		return "reset";
+	case COMMAND_QUIT:
+		exitGame(manager, false);
+	case COMMAND_INVALID_LINE:
+		printf("ERROR: invalid command\n");
+
+	}
 }
 
 
-void makeComputerTurn(ChessGameManager* manager)
-{
-
-}
-
+//
+//void makeComputerTurn(ChessGameManager* manager)
+//{
+//	Move move = MinimaxSuggestMove(game, manager->difficulty+1);
+//
+//	if ()
+//		exitGame(game, true);
+//
+//	gameMovePiece(manager->game, move);
+//	printf("Computer: move [pawn|bishop|knight|rook|queen] at <x,y> to <i,j>\n".);
+//}
 

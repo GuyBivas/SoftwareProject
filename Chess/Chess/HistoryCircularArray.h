@@ -22,4 +22,9 @@ ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src);
 
 ChessGame* circularArrayGetCurrent(HistoryCircularArray* src);
 
+bool circularArrayListIsEmpty(HistoryCircularArray* src);
+
+int circularArrayListSize(HistoryCircularArray* src);
+
+
 #endif

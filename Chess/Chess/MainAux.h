@@ -12,11 +12,11 @@
 
 ParsedCommand getCommand();
 
-void commandExecution(ChessGameManager* manager, ParsedCommand command);
+void ExecutionSettingsState(ChessGameManager* manager);
 void exitGame(ChessGameManager* manager, bool isMallocError);
-GAME_STATUS printWinner(ChessGameManager* manager);
+void printWinner(ChessGameManager* manager);
 int makeUserTurn(ChessGameManager* manager);
-void makeComputerTurn(ChessGameManager* manager);
+//void makeComputerTurn(ChessGameManager* manager);
 
 void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command);
 void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command);
