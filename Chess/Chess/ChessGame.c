@@ -52,14 +52,31 @@ ChessGame* gameCopy(ChessGame* game)
 
 	copy->currentPlayer = game->currentPlayer;
 	copy->status = game->status;
-	copy->whiteKing = game->whiteKing;
-	copy->blackKing = game->blackKing;
 
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			copy->gameBoard[i][j] = game->gameBoard[i][j];
+			ChessPiece* piece = game->gameBoard[i][j];
+
+			if (piece == NULL)
+			{
+				copy->gameBoard[i][j] = NULL;
+			}
+			else
+			{
+				copy->gameBoard[i][j] = (ChessPiece*)malloc(sizeof(ChessPiece));
+
+				if (copy->gameBoard[i][j] == NULL) 
+				{
+					mallocError = true;
+					return NULL;
+				}
+
+				copy->gameBoard[i][j]->color = piece->color;
+				copy->gameBoard[i][j]->position = piece->position;
+				copy->gameBoard[i][j]->type = piece->type;
+			}
 		}
 	}
 
@@ -75,7 +92,8 @@ void gameDestroy(ChessGame* game)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			free(game->gameBoard[i][j]);
+			if (game->gameBoard[i][j] != NULL)
+				free(game->gameBoard[i][j]);
 		}
 	}
 
@@ -162,7 +180,7 @@ PLAYER_COLOR getOpositeColor(PLAYER_COLOR color)
 
 bool checkClearPath(ChessGame* game, Move move)
 {
-	Vector2 step = vecNormilized(vecDiff(move.from, move.to));
+	Vector2 step = vecNormilized(vecDiff(move.to, move.from));
 
 	// check that there is no piece between move.from and move.to
 	// start at move.from, go one step at a time until move.to
@@ -185,7 +203,7 @@ bool isValidMovePawn(ChessGame* game, Move move)
 	Vector2 normDiff = vecNormilized(diff);
 
 	// check if moving the right direction
-	int colorDirection = (pawn->color == WHITE ? 1 : -1);
+	int colorDirection = (pawn->color == WHITE ? -1 : 1);
 	if (normDiff.x != colorDirection)
 		return false;
 
@@ -325,8 +343,18 @@ bool logicCheckThreatened(ChessGame* game, Position pos, PLAYER_COLOR currColor)
 
 bool logicIsKingThreatened(ChessGame* game, PLAYER_COLOR color)
 {
-	ChessPiece* king = (color == WHITE ? game->whiteKing : game->blackKing);
-	return logicCheckThreatened(game, king->position, color);
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			Position pos = newPos(i, j);
+			ChessPiece* piece = gameGetPieceAt(game, pos);
+			if (piece != NULL && piece->type == KING)
+				return logicCheckThreatened(game, pos, color);
+		}
+	}
+
+	return false; // not suppose to get here
 }
 
 void logicUpdateGameStatus(ChessGame* game)

@@ -21,11 +21,11 @@ int main()
 
 	while (true)
 	{
-		if (isSettingsState)//settings mode
+		if (isSettingsState) //settings mode
 			isSettingsState = ExecutionSettingsState(manager);
-		else if (manager->mode == TWO_PLAYERS || manager->game->currentPlayer == getOpositeColor(manager->computerColor))//TWO_PLAYERS mode oruser turn on ONE_PLAYER mode
+		else if (manager->mode == TWO_PLAYERS || manager->game->currentPlayer == getOpositeColor(manager->computerColor))//TWO_PLAYERS mode or user turn on ONE_PLAYER mode
 			isSettingsState = makeUserTurn(manager);
-		//	else // computer's turn 
-		//	makeComputerTurn(manager)
+		else // computer's turn 
+			makeComputerTurn(manager);
 	}
 }

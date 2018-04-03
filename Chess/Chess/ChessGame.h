@@ -20,8 +20,6 @@ typedef struct chess_game {
 	ChessPiece* gameBoard[8][8];
 	PLAYER_COLOR currentPlayer;
 	GAME_STATUS status;
-	ChessPiece* whiteKing;
-	ChessPiece* blackKing;
 } ChessGame;
 
 ChessPiece* gameGetPieceAt(ChessGame* game, Position pos);

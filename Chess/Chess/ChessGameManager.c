@@ -38,10 +38,10 @@ ChessGameManager* gameManagerCreate(int historySize)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			manager->game->gameBoard[i][j] = NULL;
+			manager->game->gameBoard[j][i] = NULL;
 			if (j <= 1 || j >= 6)
 			{
-				Position pos = newPos(i, j);
+				Position pos = newPos(j, i);
 				ChessPiece* piece = (ChessPiece*)malloc(sizeof(ChessPiece));
 				if (piece == NULL)
 					return NULL;
@@ -66,17 +66,10 @@ ChessGameManager* gameManagerCreate(int historySize)
 						piece->type = KNIGHT;
 					else if (i == 2 || i == 5)
 						piece->type = BISHOP;
-					else if (i == 4)
-						piece->type = QUEEN;
 					else if (i == 3)
-					{
+						piece->type = QUEEN;
+					else if (i == 4)
 						piece->type = KING;
-
-						if (piece->color == WHITE)
-							manager->game->whiteKing = piece;
-						else
-							manager->game->blackKing = piece;
-					}
 				}
 			}
 		}
@@ -167,7 +160,7 @@ CHESS_GAME_MESSAGE gameManagerPrintBoard(ChessGameManager* src)
 		printf("%d| ", j + 1);
 		for (int i = 0; i < 8; i++)
 		{
-			printPiece(gameGetPieceAt(src->game, newPos(i, j)));
+			printPiece(gameGetPieceAt(src->game, newPos(j, i)));
 		}
 
 		printf("|\n");

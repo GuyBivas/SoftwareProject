@@ -94,13 +94,10 @@ ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src)
 	return ARRAY_LIST_SUCCESS;
 }
 
-
-
 bool circularArrayListIsEmpty(HistoryCircularArray* src)
 {
 	return src->actualSize == 0;
 }
-
 
 int circularArrayListSize(HistoryCircularArray* src)
 {

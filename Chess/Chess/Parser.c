@@ -47,9 +47,6 @@ char* enumToStringSC(COMMAND c)
 	}
 }
 
-
-
-
 char* enumArgToString(ParsedCommand c)
 {
 	switch (c.cmd)
@@ -71,11 +68,6 @@ char* enumArgToString(ParsedCommand c)
 	}
 	return NULL;
 }
-
-
-
-
-
 
 char* difficultyArgPrint(char* c)
 {
@@ -100,10 +92,6 @@ char* difficultyArgPrint(char* c)
 	return NULL;
 }
 
-
-
-
-
 bool spParserIsInt(const char* str)
 {
 	for (unsigned int i = 0; i < strlen(str); i++)
@@ -114,8 +102,6 @@ bool spParserIsInt(const char* str)
 
 	return true;
 }
-
-
 
 ParsedCommand ParserPraseLine(const char* str)
 {
@@ -207,6 +193,8 @@ ParsedCommand ParserPraseLine(const char* str)
 	}
 	if (output.cmd == COMMAND_MOVE)
 	{
+		output.arg = (char*)malloc(sizeof(char)*4); // TODO: free
+
 		for (int i = 0; i < 3; i++)
 		{
 			word = strtok(NULL, " \t\r\n");
@@ -228,7 +216,6 @@ ParsedCommand ParserPraseLine(const char* str)
 			}
 		}
 
-
 		//if (strtok(NULL, " \t\r\n") != NULL) //in case there are unnecessary letters
 		//{
 		//	output.cmd = SP_INVALID_LINE;
@@ -249,7 +236,6 @@ ParsedCommand ParserPraseLine(const char* str)
 	return output;
 }
 
-
 bool FileExists(const char *path)
 {
 	FILE *fp;
@@ -264,7 +250,6 @@ bool FileExists(const char *path)
 
 	return fsize > 0;
 }
-
 
 bool isValidLocation(const char *word)
 {

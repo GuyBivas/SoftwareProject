@@ -40,7 +40,7 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 		exitGame(manager, false);
 		return true;
 	case COMMAND_START:
-		printf("Starting game…\n");
+		printf("Starting game...\n");
 		return false; // "start";
 	}
 
@@ -168,8 +168,8 @@ void ExecutionCommandUndo(ChessGameManager* manager)
 
 void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 {
-	Position from = newPos(command.arg[0], command.arg[1]);
-	Position to = newPos(command.arg[2], command.arg[3]);
+	Position from = newPos(command.arg[0] - '1', command.arg[1] - 'A');
+	Position to = newPos(command.arg[2] - '1', command.arg[3] - 'A');
 	Move move = newMove(from, to);
 
 	switch (logicIsValidMove(manager->game, move))
@@ -269,6 +269,9 @@ void printWinner(ChessGameManager* manager)
 
 bool makeUserTurn(ChessGameManager* manager)
 {
+	gameManagerPrintBoard(manager);
+	printf("Enter your move (%s player):\n", getPlayerColorName(manager->game->currentPlayer));
+
 	ParsedCommand curCommand = getCommand();
 
 	switch (curCommand.cmd)
@@ -322,7 +325,7 @@ void printComputerMove(ChessGameManager* manager, Move move)
 	case KING:
 		pieceString = "king";
 	}
-	printf("Computer: move %s at <%d,%d> to <%d,%d>\n", pieceString, move.from.x, move.from.y, move.to.x, move.to.y);
+	printf("Computer: move %s at <%d,%c> to <%d,%c>\n", pieceString, move.from.x + 1, move.from.y + 'A', move.to.x + 1, move.to.y + 'A');
 }
 
 void makeComputerTurn(ChessGameManager* manager)
@@ -331,7 +334,7 @@ void makeComputerTurn(ChessGameManager* manager)
 	//if (move == )//?
 	//	exitGame(game, true);
 
-	gameManagerMakeMove(manager, move);
 	printComputerMove(manager, move);
+	gameManagerMakeMove(manager, move);
 	printWinner(manager);
 }
