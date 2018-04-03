@@ -9,8 +9,6 @@
 #define HISTORY_SIZE 6
 bool mallocError;
 
-
-
 int main()
 {
 	bool isSettingsState = true;
@@ -31,4 +29,3 @@ int main()
 		//	makeComputerTurn(manager)
 	}
 }
-

@@ -14,7 +14,6 @@ ParsedCommand getCommand()
 	return cmd;
 }
 
-
 bool ExecutionSettingsState(ChessGameManager* manager)
 {
 	ParsedCommand command = getCommand();
@@ -44,8 +43,9 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 		printf("Starting game…\n");
 		return false; // "start";
 	}
-}
 
+	return true;
+}
 
 void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command)
 {
@@ -63,7 +63,6 @@ void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command)
 	}
 }
 
-
 void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command)
 {
 	if (command.validArg == true)
@@ -76,7 +75,6 @@ void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command
 		printf("Wrong difficulty level. The value should be between 1 to 5\n");
 	}
 }
-
 
 void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 {
@@ -92,7 +90,6 @@ void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 		printf("ERROR: invalid command\n");
 	}
 }
-
 
 Move getLastMove(ChessGameManager* manager)
 {
@@ -125,7 +122,6 @@ Move getLastMove(ChessGameManager* manager)
 	return lastMove;
 }
 
-
 void printLastMove(ChessGameManager* manager, Move* lastMove)
 {
 	Position from = lastMove->from;
@@ -146,12 +142,10 @@ void printLastMove(ChessGameManager* manager, Move* lastMove)
 	printf("Undo move for %s player: <%d,%d> -> <%d,%d>\n", color, from.x, from.y, to.x, to.y);
 }
 
-
 void ExecutionCommandUndo(ChessGameManager* manager)
 {
 	int k = 2;
 	Move lastMove;
-	PLAYER_COLOR currentPlayer;
 
 	if (circularArrayListIsEmpty(manager->history))
 	{
@@ -172,14 +166,11 @@ void ExecutionCommandUndo(ChessGameManager* manager)
 	}
 }
 
-
 void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 {
-
 	Position from = newPos(command.arg[0], command.arg[1]);
 	Position to = newPos(command.arg[2], command.arg[3]);
 	Move move = newMove(from, to);
-
 
 	switch (logicIsValidMove(manager->game, move))
 	{
@@ -208,16 +199,12 @@ void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 		printWinner(manager);
 		exitGame(manager, true);
 	}
-
-
-
 }
-
 
 void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 {
-	int x = atoi(command.arg[1]);
-	int y = atoi(command.arg[3]);
+	int x = command.arg[1] - '0';
+	int y = command.arg[3] - '0';
 	Position pos = newPos(x, y);
 
 	if (command.validArg == false)
@@ -231,7 +218,7 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 		return;
 	}
 
-	MoveOptionsList* validMoves = gameGetPieceValidMoves(manager, pos, true);
+	MoveOptionsList* validMoves = gameGetPieceValidMoves(manager->game, pos, true);
 
 	for (int i = 0; i < arrayListSize(validMoves); i++)
 	{
@@ -249,7 +236,6 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 
 	arrayListDestroy(validMoves);
 }
-
 
 void exitGame(ChessGameManager* manager, bool isMallocError)
 {
@@ -281,13 +267,8 @@ void printWinner(ChessGameManager* manager)
 	}
 }
 
-
-
-
 bool makeUserTurn(ChessGameManager* manager)
 {
-	Move suggestedMove;
-	CHESS_GAME_MESSAGE gameMsg;
 	ParsedCommand curCommand = getCommand();
 
 	switch (curCommand.cmd)
@@ -313,11 +294,9 @@ bool makeUserTurn(ChessGameManager* manager)
 		return false;
 
 	}
+
+	return false;
 }
-
-
-
-
 
 void printComputerMove(ChessGameManager* manager, Move move)
 {
@@ -344,19 +323,15 @@ void printComputerMove(ChessGameManager* manager, Move move)
 		pieceString = "king";
 	}
 	printf("Computer: move %s at <%d,%d> to <%d,%d>\n", pieceString, move.from.x, move.from.y, move.to.x, move.to.y);
-
 }
 
 void makeComputerTurn(ChessGameManager* manager)
 {
-	Move move = minimaxSuggestMove(manager, manager->difficulty + 1);
+	Move move = minimaxSuggestMove(manager->game, manager->difficulty + 1);
 	//if (move == )//?
 	//	exitGame(game, true);
 
-
 	gameManagerMakeMove(manager, move);
-	printComputerMove(manager->game, move);
+	printComputerMove(manager, move);
 	printWinner(manager);
 }
-
-
