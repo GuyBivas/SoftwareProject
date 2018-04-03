@@ -3,6 +3,7 @@
 #include "MainAux.h"
 
 #define HISTORY_SIZE 6
+bool mallocError;
 
 int main()
 {

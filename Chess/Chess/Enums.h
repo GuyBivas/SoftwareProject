@@ -1,6 +1,8 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
+extern bool mallocError;
+
 #pragma region Game State
 
 typedef enum {

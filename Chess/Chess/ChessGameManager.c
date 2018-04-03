@@ -5,8 +5,6 @@
 #include "MoveOptionsList.h"
 #include "HistoryCircularArray.h"
 
-#pragma region Game Functions
-
 ChessGameManager* gameManagerCreate(int historySize)
 {
 	if (historySize <= 0) //TODO: check if needed
@@ -17,9 +15,6 @@ ChessGameManager* gameManagerCreate(int historySize)
 	if (manager == NULL)
 		return NULL;
 
-	//TODO: do createGame with malloc and move code there
-	manager->game->status = STATUS_NORMAL;
-	manager->game->currentPlayer = WHITE;
 	manager->mode = ONE_PLAYER;
 	manager->difficulty = EASY;
 	manager->history = circularArrayCreate(historySize);
@@ -30,6 +25,15 @@ ChessGameManager* gameManagerCreate(int historySize)
 		return NULL;
 	}
 
+	manager->game = (ChessGame*)malloc(sizeof(ChessGame));
+
+	if (manager->game == NULL)
+		return NULL;
+
+	manager->game->status = STATUS_NORMAL;
+	manager->game->currentPlayer = WHITE;
+
+	// create board
 	for (int i = 0; i < 8; i++)
 	{
 		for (int j = 0; j < 8; j++)
@@ -87,32 +91,14 @@ void gameManagerDestroy(ChessGameManager* src)
 		return;
 
 	circularArrayDestroy(src->history);
-
-	for (int i = 0; i < 8; i++)
-	{
-		for (int j = 0; j < 8; j++)
-		{
-			free(src->game->gameBoard[i][j]);
-		}
-	}
-
+	gameDestroy(src->game);
 	free(src);
 }
 
-bool gameManagerMakeMove(ChessGameManager* src, Move move)
+void gameManagerMakeMove(ChessGameManager* src, Move move)
 {
-	if (logicIsValidMove(src->game, move) == false)
-		return false;
-
 	circularArrayAdd(src->history, gameCopy(src->game));
-
-	gameMovePiece(src->game, move);
-	logicUpdateGameStatus(src->game);
-
-	if (src->game->status == STATUS_NORMAL || src->game->status == STATUS_CHECK)
-		src->game->currentPlayer = getOpositeColor(src->game->currentPlayer);
-
-	return true;
+	gameMakeMove(src->game, move);
 }
 
 void gameManagerUndoPrevMove(ChessGameManager* src)
@@ -192,5 +178,3 @@ CHESS_GAME_MESSAGE gameManagerPrintBoard(ChessGameManager* src)
 
 	return CHESS_GAME_SUCCESS;
 }
-
-#pragma endregion

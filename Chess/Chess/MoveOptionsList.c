@@ -7,6 +7,7 @@ MoveOptionsList* arrayListCreate(int maxSize)
 	MoveOptionsList* newList = (MoveOptionsList*)malloc(sizeof(MoveOptionsList));
 	if (newList == NULL)
 	{
+		mallocError = true;
 		printf("Error: arrayListCreate has failed");
 		return NULL;
 	}
@@ -23,6 +24,7 @@ MoveOptionsList* arrayListCreate(int maxSize)
 
 		if (newList->elements == NULL)
 		{
+			mallocError = true;
 			free(newList);
 			printf("Error: arrayListCreate has failed");
 			return NULL;
@@ -147,6 +149,19 @@ bool arrayListIsFull(MoveOptionsList* src)
 bool arrayListIsEmpty(MoveOptionsList* src)
 {
 	return src->actualSize == 0;
+}
+
+ARRAY_LIST_MESSAGE arrayListAddList(MoveOptionsList* src, MoveOptionsList* addition)
+{
+	if (src->maxSize < (src->actualSize + addition->actualSize))
+		return ARRAY_LIST_FULL;
+
+	for (int i = 0; i < addition->actualSize; i++)
+	{
+		arrayListAddLast(src, arrayListGetAt(addition, i));
+	}
+
+	return ARRAY_LIST_SUCCESS;
 }
 
 //bool arrayListContains(MoveOptionsList* src, Position pos)

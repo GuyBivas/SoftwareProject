@@ -31,12 +31,24 @@ void gameMovePiece(ChessGame* game, Move move)
 	gameSetPieceAt(game, move.from, NULL);
 }
 
+void gameMakeMove(ChessGame* game, Move move)
+{
+	gameMovePiece(game, move);
+	logicUpdateGameStatus(game);
+
+	if (game->status == STATUS_NORMAL || game->status == STATUS_CHECK)
+		game->currentPlayer = getOpositeColor(game->currentPlayer);
+}
+
 ChessGame* gameCopy(ChessGame* game)
 {
 	ChessGame* copy = (ChessGame*)malloc(sizeof(ChessGame));
 
 	if (copy == NULL)
+	{
+		mallocError = true;
 		return NULL;
+	}
 
 	copy->currentPlayer = game->currentPlayer;
 	copy->status = game->status;
@@ -54,10 +66,29 @@ ChessGame* gameCopy(ChessGame* game)
 	return copy;
 }
 
-MoveOptionsList* gameGetValidMoves(ChessGame* game, Position pos)
+void gameDestroy(ChessGame* game)
 {
-	MoveOptionsList* validMoves = arrayListCreate(8 * 4 - 3); // 8*4-3 is the maximum possible moves for a queen
+	if (game == NULL)
+		return;
+
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			free(game->gameBoard[i][j]);
+		}
+	}
+
+	free(game);
+}
+
+MoveOptionsList* gameGetPieceValidMoves(ChessGame* game, Position pos, bool calcThreatened)
+{
+	MoveOptionsList* validMoves = arrayListCreate(MAX_PIECE_MOVES);
 	ChessPiece* piece = gameGetPieceAt(game, pos);
+
+	if (validMoves == NULL)
+		return NULL;
 
 	if (piece == NULL)
 		return validMoves;
@@ -66,20 +97,58 @@ MoveOptionsList* gameGetValidMoves(ChessGame* game, Position pos)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			Position p = newPos(i, j);
+			Position p = newPos(j, i); // order matters
 
 			if (logicIsValidMove(game, newMove(pos, p)) == IVMR_VALID)
 			{
 				moveOption* moveOpt = (moveOption*)malloc(sizeof(moveOption));
-				moveOpt->pos = p;
-				moveOpt->isCapturing = (gameGetPieceAt(game, p) != NULL); // move to a pos of other pieace is always capturing (must be other color if valid)
-				moveOpt->isThreatened = logicCheckThreatened(game, p, piece->color);
+				moveOpt->move = newMove(pos, p);
+
+				if (calcThreatened)
+				{
+					moveOpt->isCapturing = (gameGetPieceAt(game, p) != NULL); // move to a pos of other pieace is always capturing (must be other color if valid)
+					moveOpt->isThreatened = logicCheckThreatened(game, p, piece->color);
+				}
+
 				arrayListAddLast(validMoves, moveOpt);
 			}
 		}
 	}
 
 	return validMoves;
+}
+
+MoveOptionsList* gameGetAllValidMoves(ChessGame* game, PLAYER_COLOR color)
+{
+	MoveOptionsList* allValidMoves = arrayListCreate(MAX_PLAYER_MOVES);
+
+	if (allValidMoves == NULL)
+		return NULL;
+
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			Position p = newPos(j, i); // order matters
+			ChessPiece* piece = gameGetPieceAt(game, p);
+
+			if (piece != NULL)
+			{
+				MoveOptionsList* pieceValidMoves = gameGetPieceValidMoves(game, p, false);
+				if (pieceValidMoves == NULL)
+				{
+					return NULL;
+				}
+
+				arrayListAddList(allValidMoves, pieceValidMoves);
+
+				free(pieceValidMoves->elements);
+				free(pieceValidMoves);
+			}
+		}
+	}
+
+	return allValidMoves;
 }
 
 PLAYER_COLOR getOpositeColor(PLAYER_COLOR color)
@@ -148,7 +217,7 @@ bool isValidMovePawn(ChessGame* game, Move move)
 	{
 		if (toPiece->color == pawn->color)
 			return false;
-	
+
 		if (posEqual(absDiff, newPos(1, 1)) == false)
 			return false;
 	}
@@ -221,7 +290,7 @@ ValidFuncPtr getValidFuncPtr(PIECE_TYPE type)
 
 #pragma endregion
 
-#pragma region Logic
+#pragma region Chess Logic
 
 bool logicCheckThreatened(ChessGame* game, Position pos, PLAYER_COLOR currColor)
 {
@@ -262,23 +331,28 @@ bool logicIsKingThreatened(ChessGame* game, PLAYER_COLOR color)
 
 void logicUpdateGameStatus(ChessGame* game)
 {
-	bool isEnemyKingThreatened = logicIsKingThreatened(game, getOpositeColor(game->currentPlayer));
+	bool isKingThreatened = logicIsKingThreatened(game, getOpositeColor(game->currentPlayer));
+	MoveOptionsList* moves = gameGetAllValidMoves(game, getOpositeColor(game->currentPlayer));
+	bool noMoves = arrayListIsEmpty(moves);
 
-	if (isEnemyKingThreatened)
+	if (isKingThreatened && noMoves == false)
 	{
-		/*bool isKingThreatenedAfter;
-		ChessGame* copy = gameCopy(game);
-		gameMovePiece(copy, move);
-		isKingThreatenedAfter = logicIsKingThreatened(copy, game->currentPlayer);
-		if (isKingThreatenedAfter)
-		{
-			bool isKingThreatenedBefore = logicIsKingThreatened(game, game->currentPlayer);
-			return (isKingThreatenedBefore ? IVMR_KING_STILL_THREATENED : IVMR_KING_GET_THREATENED);
-		}*/
+		game->status = STATUS_CHECK;
+	}
+	else if (isKingThreatened && noMoves)
+	{
+		game->status = STATUS_MATE;
+	}
+	else if (isKingThreatened == false && noMoves)
+	{
+		game->status = STATUS_DRAW;
 	}
 	else
 	{
+		game->status = STATUS_NORMAL;
 	}
+
+	arrayListDestroy(moves);
 }
 
 IS_VALID_MOVE_RESULT logicIsValidMoveBasic(ChessGame* game, Move move)

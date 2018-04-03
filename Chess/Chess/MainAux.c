@@ -225,12 +225,12 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 		return;
 	}
 
-	MoveOptionsList* validMoves = gameGetValidMoves(manager, pos);
+	MoveOptionsList* validMoves = gameGetPieceValidMoves(manager, pos, true);
 
 	for (int i = 0; i < arrayListSize(validMoves); i++)
 	{
 		moveOption* moveOption = arrayListGetAt(validMoves, i);
-		printf("<%d,%d>", moveOption->pos.x, moveOption->pos.y);
+		printf("<%d,%d>", moveOption->move.to.x, moveOption->move.to.y);
 
 		if (moveOption->isThreatened)
 			printf("*");
@@ -240,6 +240,8 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 		
 		printf("\n");
 	}
+
+	arrayListDestroy(validMoves);
 }
 
 

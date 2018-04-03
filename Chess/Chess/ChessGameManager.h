@@ -17,7 +17,7 @@ typedef struct chess_game_manager {
 
 ChessGameManager* gameManagerCreate(int historySize);
 void gameManagerDestroy(ChessGameManager* src);
-bool gameManagerMakeMove(ChessGameManager* src, Move move);
+void gameManagerMakeMove(ChessGameManager* src, Move move);
 void gameManagerUndoPrevMove(ChessGameManager* src);
 CHESS_GAME_MESSAGE gameManagerPrintBoard(ChessGameManager* src); // Move to console mode?
 

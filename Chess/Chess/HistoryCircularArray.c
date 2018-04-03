@@ -7,6 +7,7 @@ HistoryCircularArray* circularArrayCreate(int maxSize)
 	HistoryCircularArray* newList = (HistoryCircularArray*)malloc(sizeof(HistoryCircularArray));
 	if (newList == NULL)
 	{
+		mallocError = true;
 		printf("Error: circularArrayCreate has failed");
 		return NULL;
 	}
@@ -24,6 +25,7 @@ HistoryCircularArray* circularArrayCreate(int maxSize)
 
 		if (newList->elements == NULL)
 		{
+			mallocError = true;
 			free(newList);
 			printf("Error: circularArrayCreate has failed");
 			return NULL;
