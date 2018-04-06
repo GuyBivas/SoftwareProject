@@ -198,12 +198,12 @@ bool isValidMovePawn(ChessGame* game, Move move)
 	ChessPiece* pawn = gameGetPieceAt(game, move.from);
 	ChessPiece* toPiece = gameGetPieceAt(game, move.to);
 
-	Vector2 diff = vecDiff(move.from, move.to);
+	Vector2 diff = vecDiff(move.to, move.from);
 	Vector2 absDiff = vecAbs(diff);
 	Vector2 normDiff = vecNormilized(diff);
 
 	// check if moving the right direction
-	int colorDirection = (pawn->color == WHITE ? -1 : 1);
+	int colorDirection = (pawn->color == WHITE ? 1 : -1);
 	if (normDiff.x != colorDirection)
 		return false;
 
@@ -245,7 +245,7 @@ bool isValidMovePawn(ChessGame* game, Move move)
 
 bool isValidMoveKnight(ChessGame* game, Move move)
 {
-	Vector2 absDiff = vecAbs(vecDiff(move.from, move.to));
+	Vector2 absDiff = vecAbs(vecDiff(move.to, move.from));
 
 	return (absDiff.x == 2 && absDiff.y == 1) ||
 		(absDiff.x == 1 && absDiff.y == 2);
@@ -253,7 +253,7 @@ bool isValidMoveKnight(ChessGame* game, Move move)
 
 bool isValidMoveBishop(ChessGame* game, Move move)
 {
-	Vector2 diffAbs = vecAbs(vecDiff(move.from, move.to));
+	Vector2 diffAbs = vecAbs(vecDiff(move.to, move.from));
 
 	// check if moving in a valid diagonal
 	if (diffAbs.x != diffAbs.y)
@@ -264,7 +264,7 @@ bool isValidMoveBishop(ChessGame* game, Move move)
 
 bool isValidMoveRook(ChessGame* game, Move move)
 {
-	Vector2 diff = vecDiff(move.from, move.to);
+	Vector2 diff = vecDiff(move.to, move.from);
 
 	// check if moving in only one axis (the case both are zero is detected before)
 	if (diff.x != 0 && diff.y != 0)
@@ -280,7 +280,7 @@ bool isValidMoveQueen(ChessGame* game, Move move)
 
 bool isValidMoveKing(ChessGame* game, Move move)
 {
-	Vector2 absDiff = vecAbs(vecDiff(move.from, move.to));
+	Vector2 absDiff = vecAbs(vecDiff(move.to, move.from));
 	return absDiff.x <= 1 && absDiff.y <= 1;
 }
 

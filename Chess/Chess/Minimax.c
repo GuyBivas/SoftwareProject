@@ -11,7 +11,7 @@ int minimax(ChessGame* game, int depth, int a, int b, int color, bool returnMove
 	}
 	else
 	{
-		int moveScore;
+		int moveScore, bestMove;
 		int bestValue = -INF_SCORE;
 		MoveOptionsList* moves = gameGetAllValidMoves(game, game->currentPlayer);
 
@@ -23,16 +23,21 @@ int minimax(ChessGame* game, int depth, int a, int b, int color, bool returnMove
 			moveScore = -minimax(copy, depth - 1, -b, -a, -color, false);
 			gameDestroy(copy);
 
-			bestValue = max(bestValue, moveScore);
-			a = max(a, moveScore);
+			if (moveScore > bestValue)
+			{
+				bestValue = moveScore;
+				bestMove = i;
+			}
 
+			// pruning
+			a = max(a, moveScore);
 			if (a >= b)
 				break;
 		}
 
 		arrayListDestroy(moves);
 
-		return bestValue;
+		return (returnMove ? bestMove : bestValue);
 	}
 }
 

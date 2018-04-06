@@ -108,9 +108,6 @@ Move getLastMove(ChessGameManager* manager)
 			ChessPiece* currentPiece = gameGetPieceAt(manager->game, pos);
 			ChessPiece* previousPiece = gameGetPieceAt(beforeLastMove, pos);
 
-			if (currentPiece->color != currentPlayer)
-				continue;
-
 			if (previousPiece != NULL && currentPiece == NULL)
 				lastMove.from = pos;
 
