@@ -217,7 +217,7 @@ ParsedCommand ParserPraseLine(const char* str)
 		if (output.arg == NULL)
 		{
 			mallocError = true;
-			return;
+			return output;
 		}
 
 		for (int i = 0; i < 3; i++)

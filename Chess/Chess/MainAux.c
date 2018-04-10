@@ -243,7 +243,7 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 		return;
 	}
 
-	MoveOptionsList* validMoves = gameGetPieceValidMoves(manager->game, pos, true);
+	MoveOptionsList* validMoves = gameGetPieceValidMoves(manager->game, pos, true, false);
 
 	for (int i = 0; i < arrayListSize(validMoves); i++)
 	{
