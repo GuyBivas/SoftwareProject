@@ -4,6 +4,9 @@
 #include "MainAux.h"
 #include "Minimax.h"
 
+
+
+
 ParsedCommand getCommand()
 {
 	ParsedCommand cmd;
@@ -14,6 +17,14 @@ ParsedCommand getCommand()
 	return cmd;
 }
 
+
+void setDeafult(ChessGameManager* manager)
+{
+	manager->mode = ONE_PLAYER;
+	manager->difficulty = EASY;
+	manager->game->currentPlayer = WHITE;
+}
+
 bool ExecutionSettingsState(ChessGameManager* manager)
 {
 	ParsedCommand command = getCommand();
@@ -22,9 +33,11 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 	{
 	case COMMAND_GAME_MODE:
 		ExecutionCommandGameMode(manager, command);
+
 		return true;
 	case COMMAND_DIFFICULTY:
 		ExecutionCommandDifficulty(manager, command);
+
 		return true;
 	case COMMAND_USER_COLOR:
 		ExecutionCommandUserColor(manager, command);
@@ -32,9 +45,7 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 		//	case COMMAND_LOAD://continue tommorow from here
 		//		return; // "load";
 	case COMMAND_DEFAULT:
-		manager->mode = ONE_PLAYER;
-		manager->difficulty = EASY;
-		manager->game->currentPlayer = WHITE;
+		setDeafult(manager);
 		return true;
 	case COMMAND_QUIT:
 		exitGame(manager, false);
@@ -43,6 +54,7 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 		printf("Starting game...\n");
 		return false; // "start";
 	}
+
 
 	return true;
 }
@@ -59,6 +71,8 @@ void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command)
 	}
 	else
 	{
+		if (command.arg != NULL)
+			free(command.arg);
 		printf("Wrong game mode\n");
 	}
 }
@@ -72,6 +86,8 @@ void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command
 	}
 	else
 	{
+		if (command.arg != NULL)
+			free(command.arg);
 		printf("Wrong difficulty level. The value should be between 1 to 5\n");
 	}
 }
@@ -81,12 +97,19 @@ void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 	if (manager->mode == ONE_PLAYER)
 	{
 		if (command.validArg == true)
+		{
 			printf("User color is set to %s\n", enumArgToString(command));
+		}
 		else
+		{
+			if (command.arg != NULL)
+				free(command.arg);
 			printf("Wrong user color. The value should be 0 or 1\n");
+		}
 	}
 	else
 	{
+
 		printf("ERROR: invalid command\n");
 	}
 }
@@ -97,8 +120,7 @@ Move getLastMove(ChessGameManager* manager)
 	PLAYER_COLOR currentPlayer = manager->game->currentPlayer;
 	Move lastMove;
 
-	if (manager->game->status == STATUS_NORMAL || manager->game->status == STATUS_CHECK)
-		currentPlayer = 1 - (manager->game->currentPlayer); // todo
+	currentPlayer = getOpositeColor(manager->game->currentPlayer);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -126,10 +148,7 @@ void printLastMove(ChessGameManager* manager, Move* lastMove)
 	char color[6];
 	PLAYER_COLOR currentPlayer;
 
-	if (manager->game->status == STATUS_MATE || manager->game->status == STATUS_DRAW)
-		currentPlayer = manager->game->currentPlayer;
-	else
-		currentPlayer = 1 - (manager->game->currentPlayer);
+	currentPlayer = getOpositeColor(manager->game->currentPlayer);
 
 	if (currentPlayer == WHITE)
 		strcpy(color, "white");
@@ -149,7 +168,9 @@ void ExecutionCommandUndo(ChessGameManager* manager)
 		printf("Empty history, no move to undo\n");
 		return;
 	}
-	else if (circularArrayListSize(manager->history) == 1 || (manager->game->status == STATUS_MATE && manager->game->currentPlayer == WHITE && manager->mode == ONE_PLAYER))//TODO change WHITE
+	else if (circularArrayListSize(manager->history) == 1 ||
+		((manager->game->status == STATUS_MATE || manager->game->status == STATUS_DRAW) &&
+		(manager->game->currentPlayer == manager->computerColor) && (manager->mode == ONE_PLAYER)))
 	{
 		k = 1;
 	}
@@ -159,12 +180,17 @@ void ExecutionCommandUndo(ChessGameManager* manager)
 		lastMove = getLastMove(manager);
 		printLastMove(manager, &lastMove);
 		gameManagerUndoPrevMove(manager);
-		gameManagerPrintBoard(manager);
 	}
 }
 
 void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 {
+	if (command.validArg == false)
+	{
+		printf("Invalid position on the board\n");
+		return;
+	}
+
 	Position from = newPos(command.arg[0] - '1', command.arg[1] - 'A');
 	Position to = newPos(command.arg[2] - '1', command.arg[3] - 'A');
 	Move move = newMove(from, to);
@@ -189,6 +215,8 @@ void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 
 	case IVMR_VALID:
 		gameManagerMakeMove(manager, move);
+		if (command.arg != NULL)
+			free(command.arg);
 	}
 
 	if (manager->game->status == STATUS_MATE || manager->game->status == STATUS_DRAW)
@@ -200,8 +228,8 @@ void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 
 void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 {
-	int x = command.arg[1] - '0';
-	int y = command.arg[3] - '0';
+	int x = command.arg[1] - '1';
+	int y = command.arg[3] - 'A';
 	Position pos = newPos(x, y);
 
 	if (command.validArg == false)
@@ -220,7 +248,7 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 	for (int i = 0; i < arrayListSize(validMoves); i++)
 	{
 		moveOption* moveOption = arrayListGetAt(validMoves, i);
-		printf("<%d,%d>", moveOption->move.to.x, moveOption->move.to.y);
+		printf("<%d,%c>", moveOption->move.to.x+1, moveOption->move.to.y+'A');
 
 		if (moveOption->isThreatened)
 			printf("*");
@@ -230,9 +258,15 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 
 		printf("\n");
 	}
-
+	if (command.arg != NULL)
+		free(command.arg);
 	arrayListDestroy(validMoves);
 }
+
+
+
+
+
 
 void exitGame(ChessGameManager* manager, bool isMallocError)
 {
@@ -254,7 +288,7 @@ void printWinner(ChessGameManager* manager)
 	switch (manager->game->status)
 	{
 	case STATUS_MATE:
-		printf("Checkmate! %s player wins the game\n", getPlayerColorName(manager->game->currentPlayer));
+		printf("Checkmate! %s player wins the game\n", getPlayerColorName(getOpositeColor(manager->game->currentPlayer)));
 		break;
 	case STATUS_DRAW:
 		printf("The game ends in a draw\n");
@@ -285,6 +319,12 @@ bool makeUserTurn(ChessGameManager* manager)
 		ExecutionCommandUndo(manager);
 		return false;
 	case COMMAND_RESET://TODO
+		gameDestroy(manager->game);
+		manager->game = gameCreate();
+
+		circularArrayClear(manager->history);
+
+		setDeafult(manager);
 		printf("Specify game settings or type 'start' to begin a game with the current settings:\n");
 		return true;
 	case COMMAND_QUIT:
@@ -294,6 +334,7 @@ bool makeUserTurn(ChessGameManager* manager)
 		return false;
 
 	}
+	//free(curCommand.arg);
 
 	return false;
 }
@@ -335,3 +376,5 @@ void makeComputerTurn(ChessGameManager* manager)
 	gameManagerMakeMove(manager, move);
 	printWinner(manager);
 }
+
+

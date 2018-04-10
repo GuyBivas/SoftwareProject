@@ -13,67 +13,24 @@ ChessGameManager* gameManagerCreate(int historySize)
 	ChessGameManager* manager = (ChessGameManager*)malloc(sizeof(ChessGameManager));
 
 	if (manager == NULL)
+	{
+		mallocError = true;
 		return NULL;
+	}
 
 	manager->mode = ONE_PLAYER;
 	manager->difficulty = EASY;
+	manager->computerColor = BLACK;
 	manager->history = circularArrayCreate(historySize);
 
 	if (manager->history == NULL)
 	{
 		free(manager);
+		mallocError = true;
 		return NULL;
 	}
 
-	manager->game = (ChessGame*)malloc(sizeof(ChessGame));
-
-	if (manager->game == NULL)
-		return NULL;
-
-	manager->game->status = STATUS_NORMAL;
-	manager->game->currentPlayer = WHITE;
-
-	// create board
-	for (int i = 0; i < 8; i++)
-	{
-		for (int j = 0; j < 8; j++)
-		{
-			manager->game->gameBoard[j][i] = NULL;
-			if (j <= 1 || j >= 6)
-			{
-				Position pos = newPos(j, i);
-				ChessPiece* piece = (ChessPiece*)malloc(sizeof(ChessPiece));
-				if (piece == NULL)
-					return NULL;
-
-				piece->position = pos;
-				gameSetPieceAt(manager->game, pos, piece);
-
-				if (j == 0 || j == 1)
-					piece->color = WHITE;
-				else
-					piece->color = BLACK;
-
-				if (j == 1 || j == 6)
-				{
-					piece->type = PAWN;
-				}
-				else
-				{
-					if (i == 0 || i == 7)
-						piece->type = ROOK;
-					else if (i == 1 || i == 6)
-						piece->type = KNIGHT;
-					else if (i == 2 || i == 5)
-						piece->type = BISHOP;
-					else if (i == 3)
-						piece->type = QUEEN;
-					else if (i == 4)
-						piece->type = KING;
-				}
-			}
-		}
-	}
+	manager->game = gameCreate();
 
 	return manager;
 }

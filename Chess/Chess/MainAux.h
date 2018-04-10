@@ -9,6 +9,9 @@
 #include "Enums.h"
 #include "ChessGameManager.h"
 
+#define HISTORY_SIZE 6
+bool mallocError;
+
 
 ParsedCommand getCommand();
 

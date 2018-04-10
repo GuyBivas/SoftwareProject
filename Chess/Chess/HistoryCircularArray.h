@@ -16,6 +16,8 @@ HistoryCircularArray* circularArrayCreate(int maxSize);
 
 void circularArrayDestroy(HistoryCircularArray* src);
 
+void circularArrayClear(HistoryCircularArray * src);
+
 void circularArrayAdd(HistoryCircularArray* src, ChessGame* elem);
 
 ARRAY_LIST_MESSAGE circularArrayRemove(HistoryCircularArray* src);
