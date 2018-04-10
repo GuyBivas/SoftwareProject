@@ -37,6 +37,16 @@ HistoryCircularArray* circularArrayCreate(int maxSize)
 
 void circularArrayDestroy(HistoryCircularArray * src)
 {
+	circularArrayClear(src);
+	if (src->elements != NULL)
+		free(src->elements);
+
+	if (src != NULL)
+		free(src);
+}
+
+void circularArrayClear(HistoryCircularArray * src)
+{
 	if (src != NULL)
 	{
 		if (src->elements != NULL)
@@ -45,11 +55,7 @@ void circularArrayDestroy(HistoryCircularArray * src)
 			{
 				free(src->elements[i]);
 			}
-
-			free(src->elements);
 		}
-
-		free(src);
 	}
 }
 
@@ -64,7 +70,7 @@ ChessGame* circularArrayGetCurrent(HistoryCircularArray* src)
 void circularArrayAdd(HistoryCircularArray* src, ChessGame* elem)
 {
 	if (src->actualSize == src->maxSize)
-		free(src->elements[src->index]);
+		gameDestroy(src->elements[src->index]);
 
 	src->elements[src->index] = elem;
 

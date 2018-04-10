@@ -92,6 +92,25 @@ char* difficultyArgPrint(char* c)
 	return NULL;
 }
 
+
+
+GAME_DIFFICULTY difficultyStringToArg(char* c)
+{
+	if (strcmp(c, "DIFFICULTY: amateur"))
+		return AMATEUR;
+	if (strcmp(c, "DIFFICULTY: easy"))
+		return EASY;
+	if (strcmp(c, "DIFFICULTY: moderate"))
+		return MODERATE;
+	if (strcmp(c, "DIFFICULTY: hard"))
+		return HARD;
+	if (strcmp(c, "DIFFICULTY: expert"))
+		return EXPERT;
+	return EASY;
+}
+
+
+
 bool spParserIsInt(const char* str)
 {
 	for (unsigned int i = 0; i < strlen(str); i++)
@@ -193,7 +212,13 @@ ParsedCommand ParserPraseLine(const char* str)
 	}
 	if (output.cmd == COMMAND_MOVE)
 	{
-		output.arg = (char*)malloc(sizeof(char)*4); // TODO: free
+		output.arg = (char*)malloc(sizeof(char) * 4); // TODO: free
+
+		if (output.arg == NULL)
+		{
+			mallocError = true;
+			return;
+		}
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -231,6 +256,7 @@ ParsedCommand ParserPraseLine(const char* str)
 			output.validArg = false;
 		if (isValidLocation(word) == false)
 			output.validArg = false;
+		output.arg = word;
 	}
 
 	return output;
