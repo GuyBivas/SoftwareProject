@@ -13,7 +13,7 @@ int minimax(ChessGame* game, int depth, int a, int b, int color, bool returnMove
 	{
 		int moveScore, bestMove;
 		int bestValue = -INF_SCORE;
-		MoveOptionsList* moves = gameGetAllValidMoves(game, game->currentPlayer);
+		MoveOptionsList* moves = gameGetAllValidMoves(game, game->currentPlayer, false);
 
 		for (int i = 0; i < moves->actualSize; i++)
 		{
@@ -44,7 +44,7 @@ int minimax(ChessGame* game, int depth, int a, int b, int color, bool returnMove
 Move minimaxSuggestMove(ChessGame* game, int depth)
 {
 	int moveIndex = minimax(game, depth, -INF_SCORE, INF_SCORE, (game->currentPlayer == WHITE ? 1 : -1), true);
-	MoveOptionsList* moves = gameGetAllValidMoves(game, game->currentPlayer);
+	MoveOptionsList* moves = gameGetAllValidMoves(game, game->currentPlayer, false);
 
 	return arrayListGetAt(moves, moveIndex)->move;
 }
@@ -91,7 +91,7 @@ int getGameScore(ChessGame* game)
 	}
 	else if (game->status == STATUS_MATE)
 	{
-		score = MATE_SCORE;
+		score = -(game->currentPlayer == WHITE ? MATE_SCORE : -MATE_SCORE);
 	}
 	else
 	{

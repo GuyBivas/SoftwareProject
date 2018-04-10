@@ -34,10 +34,93 @@ void gameMovePiece(ChessGame* game, Move move)
 void gameMakeMove(ChessGame* game, Move move)
 {
 	gameMovePiece(game, move);
-	logicUpdateGameStatus(game);
 
-	if (game->status == STATUS_NORMAL || game->status == STATUS_CHECK)
-		game->currentPlayer = getOpositeColor(game->currentPlayer);
+	game->currentPlayer = getOpositeColor(game->currentPlayer);
+	logicUpdateGameStatus(game);
+}
+
+ChessGame* gameCreate()
+{
+	ChessGame* game = (ChessGame*)malloc(sizeof(ChessGame));
+
+	if (game == NULL)
+	{
+		mallocError = true;
+		return NULL;
+	}
+
+	game->status = STATUS_NORMAL;
+	game->currentPlayer = WHITE;
+
+	// create board
+	for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 8; j++)
+		{
+			game->gameBoard[j][i] = NULL;
+			if (j <= 1 || j >= 6)
+			{
+				Position pos = newPos(j, i);
+				ChessPiece* piece = (ChessPiece*)malloc(sizeof(ChessPiece));
+				if (piece == NULL)
+				{
+					mallocError = true;
+					return NULL;
+				}
+
+				piece->position = pos;
+				gameSetPieceAt(game, pos, piece);
+
+				if (j == 0 || j == 1)
+					piece->color = WHITE;
+				else
+					piece->color = BLACK;
+
+				if (j == 1 || j == 6)
+				{
+					piece->type = PAWN;
+				}
+				else
+				{
+					if (i == 0 || i == 7)
+						piece->type = ROOK;
+					else if (i == 1 || i == 6)
+						piece->type = KNIGHT;
+					else if (i == 2 || i == 5)
+						piece->type = BISHOP;
+					else if (i == 3)
+						piece->type = QUEEN;
+					else if (i == 4)
+						piece->type = KING;
+				}
+			}
+		}
+	}
+	return game;
+}
+
+ChessPiece* chessPieceCopy(ChessPiece* piece)
+{
+	if (piece == NULL)
+	{
+		return NULL;
+	}
+	else
+	{
+		ChessPiece* copy = (ChessPiece*)malloc(sizeof(ChessPiece));
+
+		if (copy == NULL)
+		{
+			mallocError = true;
+			return NULL;
+		}
+
+		copy->color = piece->color;
+		copy->position = piece->position;
+		copy->type = piece->type;
+
+		return copy;
+	}
 }
 
 ChessGame* gameCopy(ChessGame* game)
@@ -57,26 +140,7 @@ ChessGame* gameCopy(ChessGame* game)
 	{
 		for (int j = 0; j < 8; j++)
 		{
-			ChessPiece* piece = game->gameBoard[i][j];
-
-			if (piece == NULL)
-			{
-				copy->gameBoard[i][j] = NULL;
-			}
-			else
-			{
-				copy->gameBoard[i][j] = (ChessPiece*)malloc(sizeof(ChessPiece));
-
-				if (copy->gameBoard[i][j] == NULL) 
-				{
-					mallocError = true;
-					return NULL;
-				}
-
-				copy->gameBoard[i][j]->color = piece->color;
-				copy->gameBoard[i][j]->position = piece->position;
-				copy->gameBoard[i][j]->type = piece->type;
-			}
+			copy->gameBoard[i][j] = chessPieceCopy(game->gameBoard[i][j]);
 		}
 	}
 
@@ -100,7 +164,7 @@ void gameDestroy(ChessGame* game)
 	free(game);
 }
 
-MoveOptionsList* gameGetPieceValidMoves(ChessGame* game, Position pos, bool calcThreatened)
+MoveOptionsList* gameGetPieceValidMoves(ChessGame* game, Position pos, bool calcThreatened, bool returnAfterFirst)
 {
 	MoveOptionsList* validMoves = arrayListCreate(MAX_PIECE_MOVES);
 	ChessPiece* piece = gameGetPieceAt(game, pos);
@@ -120,6 +184,13 @@ MoveOptionsList* gameGetPieceValidMoves(ChessGame* game, Position pos, bool calc
 			if (logicIsValidMove(game, newMove(pos, p)) == IVMR_VALID)
 			{
 				moveOption* moveOpt = (moveOption*)malloc(sizeof(moveOption));
+
+				if (moveOpt == NULL)
+				{
+					mallocError;
+					return NULL;
+				}
+
 				moveOpt->move = newMove(pos, p);
 
 				if (calcThreatened)
@@ -129,6 +200,9 @@ MoveOptionsList* gameGetPieceValidMoves(ChessGame* game, Position pos, bool calc
 				}
 
 				arrayListAddLast(validMoves, moveOpt);
+
+				if (returnAfterFirst)
+					return validMoves;
 			}
 		}
 	}
@@ -136,7 +210,7 @@ MoveOptionsList* gameGetPieceValidMoves(ChessGame* game, Position pos, bool calc
 	return validMoves;
 }
 
-MoveOptionsList* gameGetAllValidMoves(ChessGame* game, PLAYER_COLOR color)
+MoveOptionsList* gameGetAllValidMoves(ChessGame* game, PLAYER_COLOR color, bool returnAfterFirst)
 {
 	MoveOptionsList* allValidMoves = arrayListCreate(MAX_PLAYER_MOVES);
 
@@ -150,18 +224,24 @@ MoveOptionsList* gameGetAllValidMoves(ChessGame* game, PLAYER_COLOR color)
 			Position p = newPos(j, i); // order matters
 			ChessPiece* piece = gameGetPieceAt(game, p);
 
-			if (piece != NULL)
+			if (piece != NULL && piece->color == color)
 			{
-				MoveOptionsList* pieceValidMoves = gameGetPieceValidMoves(game, p, false);
+				MoveOptionsList* pieceValidMoves = gameGetPieceValidMoves(game, p, false, returnAfterFirst);
 				if (pieceValidMoves == NULL)
 				{
 					return NULL;
 				}
 
-				arrayListAddList(allValidMoves, pieceValidMoves);
+				if (pieceValidMoves->actualSize > 0)
+				{
+					arrayListAddList(allValidMoves, pieceValidMoves);
+				}
 
 				free(pieceValidMoves->elements);
 				free(pieceValidMoves);
+
+				if (returnAfterFirst && allValidMoves->actualSize > 0)
+					return allValidMoves;
 			}
 		}
 	}
@@ -178,13 +258,13 @@ PLAYER_COLOR getOpositeColor(PLAYER_COLOR color)
 
 #pragma region Piece Valid Functions (not in header)
 
+// check that there is no piece between move.from and move.to
 bool checkClearPath(ChessGame* game, Move move)
 {
 	Vector2 step = vecNormilized(vecDiff(move.to, move.from));
 
-	// check that there is no piece between move.from and move.to
 	// start at move.from, go one step at a time until move.to
-	for (Position p = vecAdd(move.from, step); posEqual(p, move.to) == false; p = vecAdd(p, step))
+	for (Position p = vecAdd(move.from, step); !posEqual(p, move.to); p = vecAdd(p, step))
 	{
 		if (gameGetPieceAt(game, p) != NULL)
 			return false;
@@ -312,33 +392,62 @@ ValidFuncPtr getValidFuncPtr(PIECE_TYPE type)
 
 bool logicCheckThreatened(ChessGame* game, Position pos, PLAYER_COLOR currColor)
 {
+	bool result = false;
 	// copy game to overide piece at pos, without changing the game
 	// TODO: check if it damages running time significantly
-	ChessGame* copy = gameCopy(game);
-	ChessPiece dummyPieace;
-	dummyPieace.color = currColor;
+	//ChessGame* copy = gameCopy(game);
 
-	// replace piece at pos to a dummy piece with currColor.
+	ChessPiece* posPiece = gameGetPieceAt(game, pos);
+	bool returnToNull = (posPiece == NULL);
+	bool changeColor = (posPiece != NULL && posPiece->color != currColor);
+	PLAYER_COLOR origColor = game->currentPlayer;
+
+	// replace piece at pos to a piece with currColor.
 	// neccessary for logicIsValidMove to be correct (the color must be currColor, and also for pawns)
-	gameSetPieceAt(copy, pos, &dummyPieace);
-
-	for (int i = 0; i < 8; i++)
+	if (changeColor)
 	{
-		for (int j = 0; j < 8; j++)
+		posPiece->color = currColor;
+	}
+	else if (returnToNull)
+	{
+		ChessPiece* dummyPieace = (ChessPiece*)malloc(sizeof(ChessPiece));
+		dummyPieace->color = currColor;
+		gameSetPieceAt(game, pos, dummyPieace);
+	}
+
+	// logicIsValidMoveBasic checks currentPlayer
+	game->currentPlayer = getOpositeColor(currColor);
+
+	for (int i = 0; i < 8 && !result; i++)
+	{
+		for (int j = 0; j < 8 && !result; j++)
 		{
 			Position p = newPos(i, j);
 
-			if (gameGetPieceAt(copy, p) != NULL && gameGetPieceAt(copy, p)->color != currColor) // if there is an oponent's pieace at p 
+			if (gameGetPieceAt(game, p) != NULL && gameGetPieceAt(game, p)->color != currColor) // if there is an oponent's pieace at p 
 			{
-				if (logicIsValidMoveBasic(copy, newMove(p, pos)) == IVMR_VALID) // if the oponent's pieace can eat dummyPiece
+				if (logicIsValidMoveBasic(game, newMove(p, pos)) == IVMR_VALID) // if the oponent's pieace can eat dummyPiece
 				{
-					return true;
+					result = true;
 				}
 			}
 		}
 	}
 
-	return false;
+	// restore to original game
+	game->currentPlayer = origColor;
+
+	if (changeColor)
+	{
+		posPiece->color = getOpositeColor(currColor);
+	}
+	else if (returnToNull)
+	{
+		free(gameGetPieceAt(game, pos));
+		gameSetPieceAt(game, pos, NULL);
+	}
+
+	return result;
 }
 
 bool logicIsKingThreatened(ChessGame* game, PLAYER_COLOR color)
@@ -349,7 +458,7 @@ bool logicIsKingThreatened(ChessGame* game, PLAYER_COLOR color)
 		{
 			Position pos = newPos(i, j);
 			ChessPiece* piece = gameGetPieceAt(game, pos);
-			if (piece != NULL && piece->type == KING)
+			if (piece != NULL && piece->type == KING && piece->color == color)
 				return logicCheckThreatened(game, pos, color);
 		}
 	}
@@ -359,8 +468,8 @@ bool logicIsKingThreatened(ChessGame* game, PLAYER_COLOR color)
 
 void logicUpdateGameStatus(ChessGame* game)
 {
-	bool isKingThreatened = logicIsKingThreatened(game, getOpositeColor(game->currentPlayer));
-	MoveOptionsList* moves = gameGetAllValidMoves(game, getOpositeColor(game->currentPlayer));
+	bool isKingThreatened = logicIsKingThreatened(game, game->currentPlayer);
+	MoveOptionsList* moves = gameGetAllValidMoves(game, game->currentPlayer, true);
 	bool noMoves = arrayListIsEmpty(moves);
 
 	if (isKingThreatened && noMoves == false)
@@ -419,6 +528,7 @@ IS_VALID_MOVE_RESULT logicIsValidMove(ChessGame* game, Move move)
 		ChessGame* copy = gameCopy(game);
 		gameMovePiece(copy, move);
 		isKingThreatenedAfter = logicIsKingThreatened(copy, game->currentPlayer);
+		gameDestroy(copy);
 		if (isKingThreatenedAfter)
 		{
 			bool isKingThreatenedBefore = logicIsKingThreatened(game, game->currentPlayer);
