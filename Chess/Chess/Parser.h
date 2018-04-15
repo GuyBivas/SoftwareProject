@@ -42,4 +42,6 @@ bool isValidLocation(const char *word);
 bool FileExists(const char *path);
 char* difficultyArgPrint(char* c);
 char* enumArgToString(ParsedCommand c);
+GAME_DIFFICULTY difficultyStringToArg(char* c);
+
 #endif

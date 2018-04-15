@@ -92,24 +92,20 @@ char* difficultyArgPrint(char* c)
 	return NULL;
 }
 
-
-
 GAME_DIFFICULTY difficultyStringToArg(char* c)
 {
-	if (strcmp(c, "DIFFICULTY: amateur"))
+	if (strcmp(c, "DIFFICULTY: amateur\n")==0)
 		return AMATEUR;
-	if (strcmp(c, "DIFFICULTY: easy"))
+	if (strcmp(c, "DIFFICULTY: easy\n")==0)
 		return EASY;
-	if (strcmp(c, "DIFFICULTY: moderate"))
+	if (strcmp(c, "DIFFICULTY: moderate\n")==0)
 		return MODERATE;
-	if (strcmp(c, "DIFFICULTY: hard"))
+	if (strcmp(c, "DIFFICULTY: hard\n")==0)
 		return HARD;
-	if (strcmp(c, "DIFFICULTY: expert"))
+	if (strcmp(c, "DIFFICULTY: expert\n")==0)
 		return EXPERT;
 	return EASY;
 }
-
-
 
 bool spParserIsInt(const char* str)
 {
@@ -260,21 +256,6 @@ ParsedCommand ParserPraseLine(const char* str)
 	}
 
 	return output;
-}
-
-bool FileExists(const char *path)
-{
-	FILE *fp;
-	fpos_t fsize = 0;
-
-	if (!fopen_s(&fp, path, "r"))
-	{
-		fseek(fp, 0, SEEK_END);
-		fgetpos(fp, &fsize);
-		fclose(fp);
-	}
-
-	return fsize > 0;
 }
 
 bool isValidLocation(const char *word)
