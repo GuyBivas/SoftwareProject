@@ -3,6 +3,8 @@
 #include <ctype.h>
 #include "MainAux.h"
 #include "Minimax.h"
+#include "Parser.h"
+#include "ChessGame.h"
 
 
 
@@ -17,12 +19,37 @@ ParsedCommand getCommand()
 	return cmd;
 }
 
+bool isFileExists(const char *path)
+{
+	FILE *fp;
+	fpos_t fsize = 0;
 
-void setDeafult(ChessGameManager* manager)
+	if (path == NULL)
+		return 0;
+	if (!fopen_s(&fp, path, "r"))
+	{
+		fseek(fp, 0, SEEK_END);
+		fgetpos(fp, &fsize);
+		fclose(fp);
+	}
+	return fsize > 0;
+}
+
+void removeSpaces(char* c)
+{
+	int count = 0;
+
+	for (int i = 0; c[i]; i++)
+		if (c[i] != ' ')
+			c[count++] = c[i];
+	c[count] = '\0';
+}
+
+void setDefault(ChessGameManager* manager)
 {
 	manager->mode = ONE_PLAYER;
 	manager->difficulty = EASY;
-	manager->game->currentPlayer = WHITE;
+	manager->computerColor = BLACK;
 }
 
 bool ExecutionSettingsState(ChessGameManager* manager)
@@ -33,26 +60,36 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 	{
 	case COMMAND_GAME_MODE:
 		ExecutionCommandGameMode(manager, command);
-
 		return true;
 	case COMMAND_DIFFICULTY:
 		ExecutionCommandDifficulty(manager, command);
-
 		return true;
 	case COMMAND_USER_COLOR:
 		ExecutionCommandUserColor(manager, command);
 		return true;
-		//	case COMMAND_LOAD://continue tommorow from here
-		//		return; // "load";
+	case COMMAND_LOAD:
+		if (command.validArg == false || !isFileExists(command.arg))
+		{
+			printf("Error: File doesn't exist or cannot be opened\n");
+			return true;
+		}
+		loadFile(command.arg, manager);
+		return false;
 	case COMMAND_DEFAULT:
-		setDeafult(manager);
+		setDefault(manager);
 		return true;
+	case COMMAND_PRINT_SETTINGS:
+		printf("Error: File doesn't exist or cannot be opened\n");
 	case COMMAND_QUIT:
 		exitGame(manager, false);
 		return true;
 	case COMMAND_START:
 		printf("Starting game...\n");
 		return false; // "start";
+	case COMMAND_INVALID_LINE:
+		printf("ERROR: invalid command\n");
+		return true;
+
 	}
 
 
@@ -248,7 +285,7 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 	for (int i = 0; i < arrayListSize(validMoves); i++)
 	{
 		moveOption* moveOption = arrayListGetAt(validMoves, i);
-		printf("<%d,%c>", moveOption->move.to.x+1, moveOption->move.to.y+'A');
+		printf("<%d,%c>", moveOption->move.to.x + 1, moveOption->move.to.y + 'A');
 
 		if (moveOption->isThreatened)
 			printf("*");
@@ -262,11 +299,6 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 		free(command.arg);
 	arrayListDestroy(validMoves);
 }
-
-
-
-
-
 
 void exitGame(ChessGameManager* manager, bool isMallocError)
 {
@@ -324,7 +356,7 @@ bool makeUserTurn(ChessGameManager* manager)
 
 		circularArrayClear(manager->history);
 
-		setDeafult(manager);
+		setDefault(manager);
 		printf("Specify game settings or type 'start' to begin a game with the current settings:\n");
 		return true;
 	case COMMAND_QUIT:
@@ -377,4 +409,195 @@ void makeComputerTurn(ChessGameManager* manager)
 	printWinner(manager);
 }
 
+PIECE_TYPE charToPieceType(char c)
+{
+	switch (c)
+	{
+	case 'm':
+	case 'M':
+		return PAWN;
+	case 'b':
+	case 'B':
+		return BISHOP;
+	case 'r':
+	case 'R':
+		return ROOK;
+	case 'n':
+	case 'N':
+		return KNIGHT;
+	case 'q':
+	case 'Q':
+		return QUEEN;
+	case 'k':
+	case 'K':
+		return KING;
 
+	}
+	return PAWN;
+}
+
+void loadBoard(ChessGameManager* manager, FILE* f)
+{
+	char* c = (char*)malloc(sizeof(char) * 25);
+
+	for (int j = 7; j >= 0; j--)
+	{
+		fgets(c, 25, f);
+		removeSpaces(c);
+		for (int i = 2; i <= 9; i++)
+		{
+			if (c[i] == ' ')
+				continue;
+
+			Position pos = newPos(j, i - 2);
+			if (c[i] == '_')
+			{
+				if (manager->game->gameBoard[pos.x][pos.y] != NULL)
+				{
+					free(manager->game->gameBoard[pos.x][pos.y]);
+					manager->game->gameBoard[pos.x][pos.y] = NULL;
+				}
+			}
+			else
+			{
+				ChessPiece* piece = (ChessPiece*)malloc(sizeof(ChessPiece));
+				if (piece == NULL)
+				{
+					mallocError = true;
+					break;
+				}
+				piece->position = pos;
+				piece->type = charToPieceType(c[i]);
+				if (manager->game->gameBoard[pos.x][pos.y] != NULL)
+					free(manager->game->gameBoard[pos.x][pos.y]);
+				gameSetPieceAt(manager->game, pos, piece);
+				if (c[i] > 'a')
+					piece->color = WHITE;
+				else
+					piece->color = BLACK;
+			}
+		}
+	}
+	if (c != NULL)
+		free(c);
+}
+
+void loadFile(char* filePath, ChessGameManager* manager)
+{
+	FILE* f;
+	char* c = (char*)malloc(sizeof(char) * 25);
+	setDefault(manager);
+
+	if ((f = fopen(filePath, "r")) == NULL)
+		return;
+
+	if (strcmp(fgets(c, 25, f), "white\n") == 0)//sets current turn
+		manager->game->currentPlayer = WHITE;
+	else
+		manager->game->currentPlayer = BLACK;
+
+	fgets(c, 25, f);//useless line
+
+	if (strcmp(fgets(c, 25, f), "GAME_MODE: 2-player\n") == 0)
+	{
+		manager->mode = TWO_PLAYERS;
+		loadBoard(manager, f);
+	}
+	else
+	{
+		manager->difficulty = difficultyStringToArg(fgets(c, 25, f));
+		if (strcmp(fgets(c, 25, f), "USER_COLOR: black\n") == 0)
+			manager->computerColor = WHITE;
+
+		loadBoard(manager, f);
+	}
+	free(c);
+	fclose(f);
+}
+
+
+void saveBoard(ChessGameManager* manager, FILE* f)
+{
+	char c = ' ';
+	ChessPiece* piece;
+	if (manager->game == NULL)
+		return;
+
+	for (int j = 7; j >= 0; j--)
+	{
+		fprintf(f, "%d| ", j + 1);
+		for (int i = 0; i < 8; i++)
+		{
+			piece = (gameGetPieceAt(manager->game, newPos(j, i)));
+
+			if (piece == NULL)
+			{
+				fprintf(f, "_ ");
+			}
+			else
+			{
+				switch (piece->type)
+				{
+				case PAWN:
+					c = 'M';
+					break;
+				case KNIGHT:
+					c = 'N';
+					break;
+				case ROOK:
+					c = 'R';
+					break;
+				case BISHOP:
+					c = 'B';
+					break;
+				case QUEEN:
+					c = 'Q';
+					break;
+				case KING:
+					c = 'K';
+					break;
+				}
+
+				if (piece->color == WHITE)
+					c += 'a' - 'A';
+			}
+			fprintf(f, "%c ", c);
+		}
+		fprintf(f, "|\n");
+	}
+
+	fprintf(f, "  -----------------\n");
+	fprintf(f, "   A B C D E F G H\n");
+}
+
+void saveTofile(char* filePath, ChessGameManager* manager)
+{
+	FILE *f;
+	char* currentPlayer = getPlayerColorName(manager->game->currentPlayer);
+	char* difficulty=NULL;
+	char* userColor;
+
+	if ((f = fopen(filePath, "w")) == NULL)
+		return;
+
+	fprintf(f, "%s\n", currentPlayer);
+	fprintf(f, "SETTINGS:\n");
+
+	if (manager->mode == ONE_PLAYER)
+	{
+		fprintf(f, "GAME_MODE: 1-player\n");
+		difficulty[0] = (manager->difficulty + 1) + '0';
+		difficulty = difficultyArgPrint(difficulty);
+		fprintf(f, "DIFFICULTY: %s\n", difficulty);
+		userColor = getPlayerColorName(manager->computerColor);
+		fprintf(f, "USER_COLOR: %s\n", userColor);
+		saveBoard(manager, f);
+	}
+	else
+	{
+		fprintf(f, "GAME_MODE: 2-player\n");
+		saveBoard(manager, f);
+
+	}
+	fclose(f);
+}

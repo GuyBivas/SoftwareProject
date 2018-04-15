@@ -9,6 +9,7 @@
 #include "Enums.h"
 #include "ChessGameManager.h"
 
+
 #define HISTORY_SIZE 6
 bool mallocError;
 
@@ -24,5 +25,6 @@ void makeComputerTurn(ChessGameManager* manager);
 void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command);
 void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command);
 void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command);
+void loadFile(char* filePath, ChessGameManager* manager);
 
 #endif
