@@ -10,20 +10,15 @@ ParsedCommand getCommand()
 	return cmd;
 }
 
-bool isFileExists(const char *path)
+bool isFileExists(const char *fname)
 {
-	FILE *fp;
-	fpos_t fsize = 0;
-
-	if (path == NULL)
-		return 0;
-	if (!fopen_s(&fp, path, "r"))
+	FILE *file;
+	if ((file = fopen(fname, "r")))
 	{
-		fseek(fp, 0, SEEK_END);
-		fgetpos(fp, &fsize);
-		fclose(fp);
+		fclose(file);
+		return true;
 	}
-	return fsize > 0;
+	return false;
 }
 
 void removeSpaces(char* c)
@@ -34,13 +29,6 @@ void removeSpaces(char* c)
 		if (c[i] != ' ')
 			c[count++] = c[i];
 	c[count] = '\0';
-}
-
-void setDefault(ChessGameManager* manager)
-{
-	manager->mode = ONE_PLAYER;
-	manager->difficulty = EASY;
-	manager->computerColor = BLACK;
 }
 
 bool ExecutionSettingsState(ChessGameManager* manager)
@@ -65,9 +53,9 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 			return true;
 		}
 		loadFile(command.arg, manager);
-		return false;
+		return true;
 	case COMMAND_DEFAULT:
-		setDefault(manager);
+		gameManagerSetDefault(manager);
 		return true;
 	case COMMAND_PRINT_SETTINGS:
 		printf("Error: File doesn't exist or cannot be opened\n");
@@ -337,17 +325,19 @@ bool makeUserTurn(ChessGameManager* manager)
 		ExecutionGetMoves(manager, curCommand);
 		return false;
 	case COMMAND_SAVE://TODO
+		if (saveToFile(curCommand.arg, manager) == false)
+			printf("File cannot be created or modified\n");
+		else
+			printf("Game saved to : %s\n", curCommand.arg);
 		return false;
 	case COMMAND_UNDO:
 		ExecutionCommandUndo(manager);
 		return false;
-	case COMMAND_RESET://TODO
+	case COMMAND_RESET:
 		gameDestroy(manager->game);
 		manager->game = gameCreate();
-
 		circularArrayClear(manager->history);
-
-		setDefault(manager);
+		gameManagerSetDefault(manager);
 		printf("Specify game settings or type 'start' to begin a game with the current settings:\n");
 		return true;
 	case COMMAND_QUIT:
@@ -357,7 +347,7 @@ bool makeUserTurn(ChessGameManager* manager)
 		return false;
 
 	}
-	//free(curCommand.arg);
+	free(curCommand.arg);
 
 	return false;
 }
@@ -477,7 +467,7 @@ void loadFile(char* filePath, ChessGameManager* manager)
 {
 	FILE* f;
 	char* c = (char*)malloc(sizeof(char) * 25);
-	setDefault(manager);
+	gameManagerSetDefault(manager);
 
 	if ((f = fopen(filePath, "r")) == NULL)
 		return;
@@ -508,8 +498,6 @@ void loadFile(char* filePath, ChessGameManager* manager)
 
 void saveBoard(ChessGameManager* manager, FILE* f)
 {
-	char c = ' ';
-	ChessPiece* piece;
 	if (manager->game == NULL)
 		return;
 
@@ -518,57 +506,23 @@ void saveBoard(ChessGameManager* manager, FILE* f)
 		fprintf(f, "%d| ", j + 1);
 		for (int i = 0; i < 8; i++)
 		{
-			piece = (gameGetPieceAt(manager->game, newPos(j, i)));
-
-			if (piece == NULL)
-			{
-				fprintf(f, "_ ");
-			}
-			else
-			{
-				switch (piece->type)
-				{
-				case PAWN:
-					c = 'M';
-					break;
-				case KNIGHT:
-					c = 'N';
-					break;
-				case ROOK:
-					c = 'R';
-					break;
-				case BISHOP:
-					c = 'B';
-					break;
-				case QUEEN:
-					c = 'Q';
-					break;
-				case KING:
-					c = 'K';
-					break;
-				}
-
-				if (piece->color == WHITE)
-					c += 'a' - 'A';
-			}
-			fprintf(f, "%c ", c);
+			fprintf(f, "%c ", printPiece(gameGetPieceAt(manager->game, newPos(j, i))));
 		}
 		fprintf(f, "|\n");
 	}
-
 	fprintf(f, "  -----------------\n");
 	fprintf(f, "   A B C D E F G H\n");
 }
 
-void saveTofile(char* filePath, ChessGameManager* manager)
+bool saveToFile(char* filePath, ChessGameManager* manager)
 {
 	FILE *f;
 	char* currentPlayer = getPlayerColorName(manager->game->currentPlayer);
-	char* difficulty=NULL;
+	char* difficulty= (char*)malloc(sizeof(char));
 	char* userColor;
 
 	if ((f = fopen(filePath, "w")) == NULL)
-		return;
+		return false;
 
 	fprintf(f, "%s\n", currentPlayer);
 	fprintf(f, "SETTINGS:\n");
@@ -589,6 +543,6 @@ void saveTofile(char* filePath, ChessGameManager* manager)
 		saveBoard(manager, f);
 
 	}
-
 	fclose(f);
+	return true;
 }

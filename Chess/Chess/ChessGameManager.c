@@ -13,9 +13,7 @@ ChessGameManager* gameManagerCreate(int historySize)
 		return NULL;
 	}
 
-	manager->mode = ONE_PLAYER;
-	manager->difficulty = EASY;
-	manager->computerColor = BLACK;
+	gameManagerSetDefault(manager);
 	manager->history = circularArrayCreate(historySize);
 
 	if (manager->history == NULL)
@@ -64,14 +62,14 @@ void gameManagerUndoPrevMove(ChessGameManager* src)
 	circularArrayRemove(src->history);
 }
 
-void printPiece(ChessPiece* piece)
+char printPiece(ChessPiece* piece)
 {
 	char c = ' ';
 
 	if (piece == NULL)
 	{
-		printf("_ ");
-		return;
+		c='_';
+		return c;
 	}
 
 	switch (piece->type)
@@ -99,7 +97,7 @@ void printPiece(ChessPiece* piece)
 	if (piece->color == WHITE)
 		c += 'a' - 'A';
 
-	printf("%c ", c);
+	return c;
 }
 
 CHESS_GAME_MESSAGE gameManagerPrintBoard(ChessGameManager* src)
@@ -112,7 +110,7 @@ CHESS_GAME_MESSAGE gameManagerPrintBoard(ChessGameManager* src)
 		printf("%d| ", j + 1);
 		for (int i = 0; i < 8; i++)
 		{
-			printPiece(gameGetPieceAt(src->game, newPos(j, i)));
+			printf("%c ", printPiece(gameGetPieceAt(src->game, newPos(j, i))));
 		}
 
 		printf("|\n");
@@ -122,4 +120,11 @@ CHESS_GAME_MESSAGE gameManagerPrintBoard(ChessGameManager* src)
 	printf("   A B C D E F G H\n");
 
 	return CHESS_GAME_SUCCESS;
+}
+
+void gameManagerSetDefault(ChessGameManager* manager)
+{
+	manager->mode = ONE_PLAYER;
+	manager->difficulty = EASY;
+	manager->computerColor = BLACK;
 }

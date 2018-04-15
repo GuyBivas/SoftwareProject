@@ -27,5 +27,6 @@ void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command);
 void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command);
 void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command);
 void loadFile(char* filePath, ChessGameManager* manager);
+bool saveToFile(char* filePath, ChessGameManager* manager);
 
 #endif
