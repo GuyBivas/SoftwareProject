@@ -1,31 +1,50 @@
-#include "SDL.h"
-#include "SDL_Video.h"
-#include "SDL_MainWindow.h"
+#include "SDL_Shared.h"
 
-void createWindow()
+#define BUTTON_WIDTH 307
+#define BUTTON_HEIGHT 84
+#define BUTTON_MARGIN 30
+
+Widget* buttonNew;
+Widget* buttonLoad;
+Widget* buttonExit;
+
+void clickButton(void)
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	SDL_Window* window = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 600, 400, SDL_WINDOW_SHOWN);
-	SDL_Surface* screenSurface = NULL;
+	//rend = rend;
+	//SDL_ShowSimpleMessageBox(
+	//	SDL_MESSAGEBOX_INFORMATION,
+	//	"Title",
+	//	"We did it",
+	//	NULL);
 
-	if (window == NULL)
+	changeWindow(WINDOW_SETTINGS);
+}
+
+void clickButtonExit(void)
+{
+	exitGameSDL();
+}
+
+void mainWindowCreate()
+{
+	SDL_Rect rect;
+	int buttonsX = (WINDOW_WIDTH - BUTTON_WIDTH) / 2;
+	int buttonDiffY = BUTTON_HEIGHT + BUTTON_MARGIN;
+
+	createLogo();
+
+	rect = newRect(buttonsX, 220, BUTTON_WIDTH, BUTTON_HEIGHT);
+	widgetListAddLast(widgets, createButton(rend, "assets/main/newGame.bmp", rect, clickButton));
+
+	rect = newRect(buttonsX, 220 + buttonDiffY, BUTTON_WIDTH, BUTTON_HEIGHT);
+	widgetListAddLast(widgets, createButton(rend, "assets/main/loadGame.bmp", rect, clickButton));
+
+	rect = newRect(buttonsX, 220 + 2 * buttonDiffY, BUTTON_WIDTH, BUTTON_HEIGHT);
+	widgetListAddLast(widgets, createButton(rend, "assets/main/exit.bmp", rect, clickButtonExit));
+
+	/*if (logo == NULL || buttonNew == NULL || buttonLoad == NULL || buttonExit == NULL)
 	{
-		printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-	}
-	else
-	{
-		//Get window surface
-		screenSurface = SDL_GetWindowSurface(window);
-
-		//Fill the surface white
-		SDL_FillRect(screenSurface, NULL, SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-
-		//Update the surface
-		SDL_UpdateWindowSurface(window);
-
-		//Wait two seconds
-		SDL_Delay(2000);
-	}
-
-	SDL_Quit();
+		freeResources(true);
+		return;
+	}*/
 }

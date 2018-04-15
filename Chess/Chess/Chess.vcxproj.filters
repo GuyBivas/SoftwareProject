@@ -45,6 +45,21 @@
     <ClCompile Include="SDL_MainWindow.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Button.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Widget.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDL_SettingsWindow.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SDL_MainAux.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WidgetList.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChessGame.h">
@@ -74,7 +89,16 @@
     <ClInclude Include="Position.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SDL_MainWindow.h">
+    <ClInclude Include="Button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Widget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SDL_Shared.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WidgetList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

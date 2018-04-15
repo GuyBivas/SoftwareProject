@@ -234,6 +234,5 @@ bool arrayListIsFull(MoveOptionsList* src);
 bool arrayListIsEmpty(MoveOptionsList* src);
 
 ARRAY_LIST_MESSAGE arrayListAddList(MoveOptionsList* src, MoveOptionsList* addition);
-//bool arrayListContains(MoveOptionsList* src, Position pos);
 
 #endif

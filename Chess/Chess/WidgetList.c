@@ -1,12 +1,12 @@
-#include "MoveOptionsList.h"
+#include "WidgetList.h"
 
-MoveOptionsList* arrayListCreate(int maxSize)
+WidgetList* widgetListCreate(int maxSize)
 {
-	MoveOptionsList* newList = (MoveOptionsList*)malloc(sizeof(MoveOptionsList));
+	WidgetList* newList = (WidgetList*)malloc(sizeof(WidgetList));
 	if (newList == NULL)
 	{
 		mallocError = true;
-		printf("Error: arrayListCreate has failed");
+		printf("Error: widgetListCreate has failed");
 		return NULL;
 	}
 
@@ -17,14 +17,14 @@ MoveOptionsList* arrayListCreate(int maxSize)
 	else
 	{
 		newList->maxSize = maxSize;
-		newList->elements = (moveOption**)malloc(sizeof(moveOption*) * maxSize);
+		newList->elements = (Widget**)malloc(sizeof(Widget*) * maxSize);
 		newList->actualSize = 0;
 
 		if (newList->elements == NULL)
 		{
 			mallocError = true;
 			free(newList);
-			printf("Error: arrayListCreate has failed");
+			printf("Error: widgetListCreate has failed");
 			return NULL;
 		}
 
@@ -32,7 +32,7 @@ MoveOptionsList* arrayListCreate(int maxSize)
 	}
 }
 
-void arrayListDestroy(MoveOptionsList* src)
+void widgetListDestroy(WidgetList* src)
 {
 	if (src != NULL)
 	{
@@ -50,7 +50,23 @@ void arrayListDestroy(MoveOptionsList* src)
 	}
 }
 
-ARRAY_LIST_MESSAGE arrayListAddAt(MoveOptionsList* src, moveOption* elem, int index)
+void widgetListClear(WidgetList * src)
+{
+	if (src != NULL)
+	{
+		if (src->elements != NULL)
+		{
+			for (int i = 0; i < src->actualSize; i++)
+			{
+				widgetDestroy(src->elements[i]);
+			}
+		}
+
+		src->actualSize = 0;
+	}
+}
+
+ARRAY_LIST_MESSAGE widgetListAddAt(WidgetList* src, Widget* elem, int index)
 {
 	if (src == NULL || src->actualSize < index)
 		return ARRAY_LIST_INVALID_ARGUMENT;
@@ -69,17 +85,17 @@ ARRAY_LIST_MESSAGE arrayListAddAt(MoveOptionsList* src, moveOption* elem, int in
 	return ARRAY_LIST_SUCCESS;
 }
 
-ARRAY_LIST_MESSAGE arrayListAddFirst(MoveOptionsList* src, moveOption* elem)
+ARRAY_LIST_MESSAGE widgetListAddFirst(WidgetList* src, Widget* elem)
 {
-	return arrayListAddAt(src, elem, 0);
+	return widgetListAddAt(src, elem, 0);
 }
 
-ARRAY_LIST_MESSAGE arrayListAddLast(MoveOptionsList* src, moveOption* elem)
+ARRAY_LIST_MESSAGE widgetListAddLast(WidgetList* src, Widget* elem)
 {
-	return arrayListAddAt(src, elem, src->actualSize);
+	return widgetListAddAt(src, elem, src->actualSize);
 }
 
-ARRAY_LIST_MESSAGE arrayListRemoveAt(MoveOptionsList* src, int index)
+ARRAY_LIST_MESSAGE widgetListRemoveAt(WidgetList* src, int index)
 {
 	if (src == NULL || src->actualSize <= index)
 		return ARRAY_LIST_INVALID_ARGUMENT;
@@ -98,17 +114,17 @@ ARRAY_LIST_MESSAGE arrayListRemoveAt(MoveOptionsList* src, int index)
 	return ARRAY_LIST_SUCCESS;
 }
 
-ARRAY_LIST_MESSAGE arrayListRemoveFirst(MoveOptionsList* src)
+ARRAY_LIST_MESSAGE widgetListRemoveFirst(WidgetList* src)
 {
-	return arrayListRemoveAt(src, 0);
+	return widgetListRemoveAt(src, 0);
 }
 
-ARRAY_LIST_MESSAGE arrayListRemoveLast(MoveOptionsList* src)
+ARRAY_LIST_MESSAGE widgetListRemoveLast(WidgetList* src)
 {
-	return arrayListRemoveAt(src, (src->actualSize) - 1);
+	return widgetListRemoveAt(src, (src->actualSize) - 1);
 }
 
-moveOption* arrayListGetAt(MoveOptionsList* src, int index)
+Widget* widgetListGetAt(WidgetList* src, int index)
 {
 	if (src == NULL)
 		return 0;
@@ -119,44 +135,44 @@ moveOption* arrayListGetAt(MoveOptionsList* src, int index)
 	return src->elements[index];
 }
 
-moveOption* arrayListGetFirst(MoveOptionsList* src)
+Widget* widgetListGetFirst(WidgetList* src)
 {
 	return src->elements[0];
 }
 
-moveOption* arrayListGetLast(MoveOptionsList* src)
+Widget* widgetListGetLast(WidgetList* src)
 {
 	return src->elements[src->actualSize - 1];
 }
 
-int arrayListMaxCapacity(MoveOptionsList* src)
+int widgetListMaxCapacity(WidgetList* src)
 {
 	return src->maxSize;
 }
 
-int arrayListSize(MoveOptionsList* src)
+int widgetListSize(WidgetList* src)
 {
 	return src->actualSize;
 }
 
-bool arrayListIsFull(MoveOptionsList* src)
+bool widgetListIsFull(WidgetList* src)
 {
 	return src->actualSize == src->maxSize;
 }
 
-bool arrayListIsEmpty(MoveOptionsList* src)
+bool widgetListIsEmpty(WidgetList* src)
 {
 	return src->actualSize == 0;
 }
 
-ARRAY_LIST_MESSAGE arrayListAddList(MoveOptionsList* src, MoveOptionsList* addition)
+ARRAY_LIST_MESSAGE widgetListAddList(WidgetList* src, WidgetList* addition)
 {
 	if (src->maxSize < (src->actualSize + addition->actualSize))
 		return ARRAY_LIST_FULL;
 
 	for (int i = 0; i < addition->actualSize; i++)
 	{
-		arrayListAddLast(src, arrayListGetAt(addition, i));
+		widgetListAddLast(src, widgetListGetAt(addition, i));
 	}
 
 	return ARRAY_LIST_SUCCESS;

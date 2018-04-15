@@ -1,7 +1,8 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include <math.h>
+#define absVal(a) (((a) > (0)) ? (a) : (-a))
+
 #include <stdbool.h>
 #include "Enums.h"
 

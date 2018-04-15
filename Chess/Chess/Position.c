@@ -43,7 +43,7 @@ Vector2 vecDiff(Vector2 vec1, Vector2 vec2)
 
 Vector2 vecAbs(Vector2 vec)
 {
-	return newPos(abs(vec.x), abs(vec.y));
+	return newPos(absVal(vec.x), absVal(vec.y));
 }
 
 Vector2 vecNormilized(Vector2 vec)

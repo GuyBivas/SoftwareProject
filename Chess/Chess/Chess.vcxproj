@@ -119,6 +119,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Button.c" />
+    <ClCompile Include="SDL_MainAux.c" />
     <ClCompile Include="SDL_MainWindow.c" />
     <ClCompile Include="HistoryCircularArray.c" />
     <ClCompile Include="MainAux.c" />
@@ -129,10 +131,13 @@
     <ClCompile Include="Parser.c" />
     <ClCompile Include="ChessGameManager.c" />
     <ClCompile Include="Position.c" />
+    <ClCompile Include="SDL_SettingsWindow.c" />
+    <ClCompile Include="Widget.c" />
+    <ClCompile Include="WidgetList.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Button.h" />
     <ClInclude Include="ChessGameManager.h" />
-    <ClInclude Include="SDL_MainWindow.h" />
     <ClInclude Include="HistoryCircularArray.h" />
     <ClInclude Include="MainAux.h" />
     <ClInclude Include="Minimax.h" />
@@ -141,6 +146,9 @@
     <ClInclude Include="Enums.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="Position.h" />
+    <ClInclude Include="SDL_Shared.h" />
+    <ClInclude Include="Widget.h" />
+    <ClInclude Include="WidgetList.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

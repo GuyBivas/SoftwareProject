@@ -54,6 +54,8 @@ void circularArrayClear(HistoryCircularArray * src)
 				free(src->elements[i]);
 			}
 		}
+
+		src->actualSize = 0;
 	}
 }
 
