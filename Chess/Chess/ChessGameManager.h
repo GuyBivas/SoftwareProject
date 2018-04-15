@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
-#include <math.h>
 #include "Enums.h"
 #include "ChessGame.h"
 #include "HistoryCircularArray.h"
@@ -22,6 +21,7 @@ void gameManagerDestroy(ChessGameManager* src);
 void gameManagerMakeMove(ChessGameManager* src, Move move);
 void gameManagerUndoPrevMove(ChessGameManager* src);
 CHESS_GAME_MESSAGE gameManagerPrintBoard(ChessGameManager* src); // Move to console mode?
-
+char printPiece(ChessPiece* piece);
+void gameManagerSetDefault(ChessGameManager* manager);
 
 #endif

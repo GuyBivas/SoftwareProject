@@ -90,15 +90,15 @@ char* difficultyArgPrint(char* c)
 
 GAME_DIFFICULTY difficultyStringToArg(char* c)
 {
-	if (strcmp(c, "DIFFICULTY: amateur\n")==0)
+	if (strcmp(c, "DIFFICULTY: amateur\n") == 0)
 		return AMATEUR;
-	if (strcmp(c, "DIFFICULTY: easy\n")==0)
+	if (strcmp(c, "DIFFICULTY: easy\n") == 0)
 		return EASY;
-	if (strcmp(c, "DIFFICULTY: moderate\n")==0)
+	if (strcmp(c, "DIFFICULTY: moderate\n") == 0)
 		return MODERATE;
-	if (strcmp(c, "DIFFICULTY: hard\n")==0)
+	if (strcmp(c, "DIFFICULTY: hard\n") == 0)
 		return HARD;
-	if (strcmp(c, "DIFFICULTY: expert\n")==0)
+	if (strcmp(c, "DIFFICULTY: expert\n") == 0)
 		return EXPERT;
 	return EASY;
 }
@@ -130,6 +130,7 @@ ParsedCommand ParserPraseLine(const char* str)
 		if (word != NULL && strcmp(word, enumToStringSC(command)) == 0) //checks if the input contains valid command
 			output.cmd = command;
 	}
+
 
 	if (output.cmd == COMMAND_GAME_MODE)
 	{
@@ -197,7 +198,14 @@ ParsedCommand ParserPraseLine(const char* str)
 			output.validArg = false;
 		else
 		{
-			output.arg = word;
+			output.arg = (char*)malloc(sizeof(char) * (sizeof(word) / sizeof(char))); // TODO: free
+			if (output.arg == NULL)
+			{
+				mallocError = true;
+				return output;
+			}
+			strcpy(output.arg, word);
+			//output.arg = word;
 			output.validArg = true;
 		}
 
