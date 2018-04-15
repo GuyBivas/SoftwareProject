@@ -1,9 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 #include "ChessGameManager.h"
-#include "MoveOptionsList.h"
-#include "HistoryCircularArray.h"
 
 ChessGameManager* gameManagerCreate(int historySize)
 {
@@ -71,7 +66,7 @@ void gameManagerUndoPrevMove(ChessGameManager* src)
 
 void printPiece(ChessPiece* piece)
 {
-	char c;
+	char c = ' ';
 
 	if (piece == NULL)
 	{
@@ -82,7 +77,7 @@ void printPiece(ChessPiece* piece)
 	switch (piece->type)
 	{
 	case PAWN:
-		c = 'P';
+		c = 'M';
 		break;
 	case KNIGHT:
 		c = 'N';

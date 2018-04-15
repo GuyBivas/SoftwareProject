@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "HistoryCircularArray.h"
 
 HistoryCircularArray* circularArrayCreate(int maxSize)

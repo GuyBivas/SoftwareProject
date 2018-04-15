@@ -1,15 +1,13 @@
 #include <stdio.h>
 #include "ChessGameManager.h"
 #include "MainAux.h"
-
-#include <stdio.h>
-#include "ChessGameManager.h"
-#include "MainAux.h"
-
+#include "SDL_MainWindow.h"
 
 
 int main()
 {
+	createWindow();
+
 	bool isSettingsState = true;
 	ChessGameManager* manager = gameManagerCreate(HISTORY_SIZE);
 

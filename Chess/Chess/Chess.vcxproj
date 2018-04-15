@@ -76,7 +76,13 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_MBCS;%(PreprocessorDefinitions)_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\SDL\SDL2-devel-2.0.5-VC\SDL2-2.0.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\SDL\SDL2-devel-2.0.5-VC\SDL2-2.0.5\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -113,6 +119,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="SDL_MainWindow.c" />
     <ClCompile Include="HistoryCircularArray.c" />
     <ClCompile Include="MainAux.c" />
     <ClCompile Include="Minimax.c" />
@@ -125,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ChessGameManager.h" />
+    <ClInclude Include="SDL_MainWindow.h" />
     <ClInclude Include="HistoryCircularArray.h" />
     <ClInclude Include="MainAux.h" />
     <ClInclude Include="Minimax.h" />

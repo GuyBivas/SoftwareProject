@@ -1,6 +1,8 @@
 #ifndef MOVEOPTIONSLIST_H
 #define MOVEOPTIONSLIST_H
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
 #include "Position.h"
 #include "Enums.h"

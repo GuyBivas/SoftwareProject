@@ -1,6 +1,7 @@
 #ifndef POSITION_H
 #define POSITION_H
 
+#include <math.h>
 #include <stdbool.h>
 #include "Enums.h"
 

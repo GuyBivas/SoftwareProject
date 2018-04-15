@@ -2,7 +2,9 @@
 #define CHESSGAMEMANAGER_H
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <stdbool.h>
+#include <math.h>
 #include "Enums.h"
 #include "ChessGame.h"
 #include "HistoryCircularArray.h"

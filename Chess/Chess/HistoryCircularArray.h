@@ -1,6 +1,8 @@
 #ifndef HISTORYCIRCULARARRAY_H
 #define HISTORYCIRCULARARRAY_H
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include "ChessGame.h"
 #include "Enums.h"

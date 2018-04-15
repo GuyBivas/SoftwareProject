@@ -1,4 +1,3 @@
-#include <math.h>
 #include "Position.h"
 
 Position newPos(int x, int y)
