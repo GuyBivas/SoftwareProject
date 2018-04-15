@@ -1,8 +1,4 @@
-#include <stdio.h>
 #include "Parser.h"
-#include "Enums.h"
-#include <stdlib.h>
-#include <string.h>
 
 /**
 * Given an SP_COMMAND, this function returns the relevant string.

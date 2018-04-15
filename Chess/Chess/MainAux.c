@@ -1,13 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
 #include "MainAux.h"
-#include "Minimax.h"
-#include "Parser.h"
-#include "ChessGame.h"
-
-
-
 
 ParsedCommand getCommand()
 {
@@ -515,7 +506,6 @@ void loadFile(char* filePath, ChessGameManager* manager)
 	fclose(f);
 }
 
-
 void saveBoard(ChessGameManager* manager, FILE* f)
 {
 	char c = ' ';
@@ -599,5 +589,6 @@ void saveTofile(char* filePath, ChessGameManager* manager)
 		saveBoard(manager, f);
 
 	}
+
 	fclose(f);
 }

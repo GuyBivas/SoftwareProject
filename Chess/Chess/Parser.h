@@ -1,8 +1,11 @@
 #ifndef PARSER_H
 #define PARSER_H
 
+#include <stdio.h>
 #include <stdbool.h>
 #include "Enums.h"
+#include <stdlib.h>
+#include <string.h>
 
 //specify the maximum line length
 #define MAX_LINE_LENGTH 2048

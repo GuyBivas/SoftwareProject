@@ -2,17 +2,18 @@
 #ifndef MAINAUX_H
 #define MAINAUX_H
 
-#include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <ctype.h>
 #include "Parser.h"
 #include "Enums.h"
 #include "ChessGameManager.h"
-
+#include "Minimax.h"
 
 #define HISTORY_SIZE 6
 bool mallocError;
-
 
 ParsedCommand getCommand();
 
