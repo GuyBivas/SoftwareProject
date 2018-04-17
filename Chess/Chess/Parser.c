@@ -22,6 +22,8 @@ char* enumToStringSC(COMMAND c)
 		return "load";
 	case COMMAND_DEFAULT:
 		return "default";
+	case COMMAND_PRINT_SETTINGS:
+		return "print_settings";
 	case COMMAND_QUIT:
 		return "quit";
 	case COMMAND_START:
@@ -61,6 +63,8 @@ char* enumArgToString(ParsedCommand c)
 			return "black";
 		else
 			return "white";
+	default:
+		break;
 	}
 	return NULL;
 }
@@ -83,6 +87,8 @@ char* difficultyArgPrint(char* c)
 		break;
 	case '5':
 		return "expert";
+		break;
+	default:
 		break;
 	}
 	return NULL;
@@ -155,13 +161,17 @@ ParsedCommand ParserPraseLine(const char* str)
 			output.validArg = false;
 		else if (spParserIsInt(word))
 		{
-			if (atoi(word) >= 1 || atoi(word) <= 5)
+			if (atoi(word) >= 1 && atoi(word) <= 5)
 			{
 				output.arg = word;
 				output.validArg = true;
 			}
 			else
 				output.validArg = false;
+		}
+		else
+		{
+			output.validArg = false;
 		}
 	}
 	if (output.cmd == COMMAND_USER_COLOR)

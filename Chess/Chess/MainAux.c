@@ -31,6 +31,36 @@ void removeSpaces(char* c)
 	c[count] = '\0';
 }
 
+char* getPlayerColorName(PLAYER_COLOR color)
+{
+	return (color == WHITE ? "white" : "black");
+}
+
+void printSettings(ChessGameManager* manager)
+{
+	char* currentPlayer = getPlayerColorName(manager->game->currentPlayer);
+	char* difficulty;// = (char*)malloc(sizeof(char));
+	char* userColor;
+
+	printf("SETTINGS:\n");
+
+	if (manager->mode == ONE_PLAYER)
+	{
+		printf("GAME_MODE: 1-player\n");
+		char cc = (char)((manager->difficulty + 1) + '0');
+		difficulty = difficultyArgPrint(&cc);
+		printf("DIFFICULTY: %s\n", difficulty);
+		userColor = getPlayerColorName(getOpositeColor(manager->computerColor));
+		printf("USER_COLOR: %s\n", userColor);
+	}
+	else
+	{
+		printf("GAME_MODE: 2-player\n");
+	}
+	/*if (difficulty != NULL)
+		free(difficulty);*/
+}
+
 bool ExecutionSettingsState(ChessGameManager* manager)
 {
 	ParsedCommand command = getCommand();
@@ -48,29 +78,31 @@ bool ExecutionSettingsState(ChessGameManager* manager)
 		return true;
 	case COMMAND_LOAD:
 		if (command.validArg == false || !isFileExists(command.arg))
-		{
 			printf("Error: File doesn't exist or cannot be opened\n");
-			return true;
-		}
-		loadFile(command.arg, manager);
+		else
+			loadFile(command.arg, manager);
 		return true;
 	case COMMAND_DEFAULT:
 		gameManagerSetDefault(manager);
+		printf("All settings reset to default\n");
 		return true;
 	case COMMAND_PRINT_SETTINGS:
-		printf("Error: File doesn't exist or cannot be opened\n");
+		printSettings(manager);
+		break;
 	case COMMAND_QUIT:
 		exitGame(manager, false);
 		return true;
 	case COMMAND_START:
 		printf("Starting game...\n");
-		return false; // "start";
+		return false;
 	case COMMAND_INVALID_LINE:
 		printf("ERROR: invalid command\n");
 		return true;
+	default:
+		printf("ERROR: invalid command\n");
+		break;
 
 	}
-
 
 	return true;
 }
@@ -84,26 +116,27 @@ void ExecutionCommandGameMode(ChessGameManager* manager, ParsedCommand command)
 		else
 			manager->mode = TWO_PLAYERS;
 		printf("Game mode is set to %s\n", enumArgToString(command));
+
 	}
 	else
 	{
-		if (command.arg != NULL)
-			free(command.arg);
 		printf("Wrong game mode\n");
 	}
 }
 
 void ExecutionCommandDifficulty(ChessGameManager* manager, ParsedCommand command)
 {
-	if (command.validArg == true)
+	if (command.validArg == true && manager->mode==ONE_PLAYER)
 	{
 		manager->difficulty = atoi(command.arg) - 1;
 		printf("Difficulty level is set to %s\n", enumArgToString(command));
 	}
+	else if(manager->mode == TWO_PLAYERS)
+	{
+		printf("ERROR: invalid command\n");
+	}
 	else
 	{
-		if (command.arg != NULL)
-			free(command.arg);
 		printf("Wrong difficulty level. The value should be between 1 to 5\n");
 	}
 }
@@ -115,17 +148,19 @@ void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 		if (command.validArg == true)
 		{
 			printf("User color is set to %s\n", enumArgToString(command));
+			if (strcmp(command.arg, "0")==0)
+				manager->computerColor = getOpositeColor(BLACK);
+			else
+				manager->computerColor = getOpositeColor(WHITE);
+
 		}
 		else
 		{
-			if (command.arg != NULL)
-				free(command.arg);
 			printf("Wrong user color. The value should be 0 or 1\n");
 		}
 	}
 	else
 	{
-
 		printf("ERROR: invalid command\n");
 	}
 }
@@ -133,10 +168,10 @@ void ExecutionCommandUserColor(ChessGameManager* manager, ParsedCommand command)
 Move getLastMove(ChessGameManager* manager)
 {
 	ChessGame* beforeLastMove = circularArrayGetCurrent(manager->history);
-	PLAYER_COLOR currentPlayer = manager->game->currentPlayer;
+	//PLAYER_COLOR currentPlayer = manager->game->currentPlayer;
 	Move lastMove;
 
-	currentPlayer = getOpositeColor(manager->game->currentPlayer);
+	//currentPlayer = getOpositeColor(manager->game->currentPlayer);
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -161,6 +196,8 @@ void printLastMove(ChessGameManager* manager, Move* lastMove)
 {
 	Position from = lastMove->from;
 	Position to = lastMove->to;
+	char from_y= 'A'+ from.y;
+	char to_y='A'+to.y;
 	char color[6];
 	PLAYER_COLOR currentPlayer;
 
@@ -171,7 +208,7 @@ void printLastMove(ChessGameManager* manager, Move* lastMove)
 	else
 		strcpy(color, "black");
 
-	printf("Undo move for %s player: <%d,%d> -> <%d,%d>\n", color, from.x, from.y, to.x, to.y);
+	printf("Undo move for %s player: <%d,%c> -> <%d,%c>\n", color, from.x+1, from_y, to.x+1, to_y);
 }
 
 void ExecutionCommandUndo(ChessGameManager* manager)
@@ -203,6 +240,8 @@ void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 {
 	if (command.validArg == false)
 	{
+		if (command.arg != NULL)
+			free(command.arg);
 		printf("Invalid position on the board\n");
 		return;
 	}
@@ -215,30 +254,31 @@ void ExecutionCommandMove(ChessGameManager* manager, ParsedCommand command)
 	{
 	case IVMR_INVALID_POSITION:
 		printf("Invalid position on the board\n");
-		return;
+		break;
 	case IVMR_NO_PIECE_IN_POS:
 		printf("The specified position does not contain your piece\n");
-		return;
+		break;
 	case IVMR_ILLEGAL_MOVE:
 		printf("Illegal move\n");
-		return;
+		break;
 	case IVMR_KING_STILL_THREATENED:
 		printf("Illegal move: king is still threatened\n");
-		return;
+		break;
 	case IVMR_KING_GET_THREATENED:
 		printf("Ilegal move: king will be threatened\n");
-		return;
-
+		break;
 	case IVMR_VALID:
-		gameManagerMakeMove(manager, move);
-		if (command.arg != NULL)
-			free(command.arg);
-	}
-
-	if (manager->game->status == STATUS_MATE || manager->game->status == STATUS_DRAW)
 	{
+		gameManagerMakeMove(manager, move);
 		printWinner(manager);
-		exitGame(manager, true);
+		if (manager->game->status == STATUS_MATE || manager->game->status == STATUS_DRAW)
+		{
+			if (command.arg != NULL)
+				free(command.arg);
+			exitGame(manager, true);
+		}
+		break;
+	}
 	}
 }
 
@@ -274,8 +314,6 @@ void ExecutionGetMoves(ChessGameManager* manager, ParsedCommand command)//TODO
 
 		printf("\n");
 	}
-	if (command.arg != NULL)
-		free(command.arg);
 	arrayListDestroy(validMoves);
 }
 
@@ -289,10 +327,6 @@ void exitGame(ChessGameManager* manager, bool isMallocError)
 	exit(0);
 }
 
-char* getPlayerColorName(PLAYER_COLOR color)
-{
-	return (color == WHITE ? "white" : "black");
-}
 
 void printWinner(ChessGameManager* manager)
 {
@@ -306,6 +340,8 @@ void printWinner(ChessGameManager* manager)
 		break;
 	case STATUS_CHECK:
 		printf("Check: %s king is threatened\n", getPlayerColorName(manager->game->currentPlayer));//make_move switched the current player
+	default:
+		break;
 	}
 }
 
@@ -320,6 +356,8 @@ bool makeUserTurn(ChessGameManager* manager)
 	{
 	case COMMAND_MOVE:
 		ExecutionCommandMove(manager, curCommand);
+		if (curCommand.arg != NULL)
+			free(curCommand.arg);
 		return false;
 	case COMMAND_GET_MOVES:
 		ExecutionGetMoves(manager, curCommand);
@@ -329,6 +367,8 @@ bool makeUserTurn(ChessGameManager* manager)
 			printf("File cannot be created or modified\n");
 		else
 			printf("Game saved to : %s\n", curCommand.arg);
+		if (curCommand.arg != NULL)
+			free(curCommand.arg);
 		return false;
 	case COMMAND_UNDO:
 		ExecutionCommandUndo(manager);
@@ -345,9 +385,9 @@ bool makeUserTurn(ChessGameManager* manager)
 	case COMMAND_INVALID_LINE:
 		printf("ERROR: invalid command\n");
 		return false;
-
+	default:
+		break;
 	}
-	free(curCommand.arg);
 
 	return false;
 }
@@ -518,7 +558,7 @@ bool saveToFile(char* filePath, ChessGameManager* manager)
 {
 	FILE *f;
 	char* currentPlayer = getPlayerColorName(manager->game->currentPlayer);
-	char* difficulty= (char*)malloc(sizeof(char));
+	char* difficulty = (char*)malloc(sizeof(char));
 	char* userColor;
 
 	if ((f = fopen(filePath, "w")) == NULL)
@@ -533,7 +573,7 @@ bool saveToFile(char* filePath, ChessGameManager* manager)
 		difficulty[0] = (manager->difficulty + 1) + '0';
 		difficulty = difficultyArgPrint(difficulty);
 		fprintf(f, "DIFFICULTY: %s\n", difficulty);
-		userColor = getPlayerColorName(manager->computerColor);
+		userColor = getPlayerColorName(getOpositeColor(manager->computerColor));
 		fprintf(f, "USER_COLOR: %s\n", userColor);
 		saveBoard(manager, f);
 	}
@@ -543,6 +583,8 @@ bool saveToFile(char* filePath, ChessGameManager* manager)
 		saveBoard(manager, f);
 
 	}
+	if (difficulty != NULL)
+		free(difficulty);
 	fclose(f);
 	return true;
 }

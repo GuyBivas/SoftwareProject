@@ -27,7 +27,7 @@ typedef struct command_t {
 bool spParserIsInt(const char* str);
 
 /**
-* Parses a specified line. If the line is a command which has an integer
+* Parses a specified line. If the line is a command which has a valid
 * argument then the argument is parsed and is saved in the field arg and the
 * field validArg is set to true. In any other case then 'validArg' is set to
 * false and the value 'arg' is undefined
@@ -41,6 +41,8 @@ bool spParserIsInt(const char* str);
 *   arg      - the integer argument in case validArg is set to true
 */
 ParsedCommand ParserPraseLine(const char* str);
+
+
 bool isValidLocation(const char *word);
 bool FileExists(const char *path);
 char* difficultyArgPrint(char* c);

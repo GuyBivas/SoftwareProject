@@ -18,7 +18,6 @@ Widget* frame1;
 Widget* frame2;
 Widget* frame3;
 
-#pragma region Settings
 
 void moveFrame(Widget* frame, int param)
 {
@@ -47,7 +46,6 @@ void clickSettingColor(int param)
 	moveFrame(frame3, param);
 }
 
-#pragma endregion
 
 void clickButtonBack(void)
 {

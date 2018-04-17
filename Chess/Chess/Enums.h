@@ -3,7 +3,7 @@
 
 extern bool mallocError;
 
-#pragma region Game State
+
 
 typedef enum {
 	PAWN,
@@ -26,9 +26,9 @@ typedef enum {
 	STATUS_NORMAL
 } GAME_STATUS;
 
-#pragma endregion
 
-#pragma region Settings State
+
+
 
 typedef enum {
 	AMATEUR,
@@ -43,9 +43,9 @@ typedef enum {
 	TWO_PLAYERS
 } PLAYER_MODE;
 
-#pragma endregion
 
-#pragma region Commands
+
+
 //a type used to represent a command
 typedef enum {
 	// settings state:
@@ -67,7 +67,7 @@ typedef enum {
 
 } COMMAND;
 
-#pragma endregion
+
 
 // Type used for returning error codes from game functions
 typedef enum {

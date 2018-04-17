@@ -18,6 +18,8 @@ void createWindow(WINDOW_TYPE newType)
 		break;
 	case WINDOW_GAME:
 		break;
+	default:
+		break;
 	}
 }
 
@@ -89,6 +91,7 @@ void SDL_Loop()
 				if (e.key.keysym.sym == SDLK_ESCAPE)
 					exitGameFlag = true;
 				break;
+
 			}
 		}
 

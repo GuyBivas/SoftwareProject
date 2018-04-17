@@ -1,4 +1,4 @@
-#pragma once
+
 #ifndef MAINAUX_H
 #define MAINAUX_H
 
